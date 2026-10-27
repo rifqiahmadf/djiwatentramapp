@@ -1,5 +1,14 @@
 # Hasil audit konfigurasi environment
 
+## Public user directory installed — 28 Oktober 2026
+
+Atas permintaan pengguna, public.pos_users_public sudah dipasang pada proyek Supabase target. Tabel public.yumi_users dan public.yumi_roles sebelumnya belum ada; hanya kedua dependensi ini yang dibootstrap, tanpa membuat akun contoh atau mengimpor data. Migration kanonis: packages/backend/supabase/migrations/20261028000100_bootstrap_public_user_directory.sql.
+
+Migration diterapkan dalam transaksi lewat job sementara pada server Dokploy memakai image API yang sudah dibuild. Verifikasi TLS tetap aktif dengan CA resmi Supabase; client TLS encrypted/authorized keduanya true. Migration dijalankan ulang untuk memeriksa idempotensi. Akses SELECT sebagai anon ke view lulus, sementara akses SELECT tabel/kolom sumber ditolak. Endpoint REST view dengan kolom direktori mengembalikan HTTP 200; permintaan limit nol ke kolom sensitif tabel sumber ditolak HTTP 401/42501. Tidak ada data pengguna yang diambil dalam pemeriksaan API.
+
+View tidak memuat password, hash/PIN fingerprint, dokumen raw atau descriptor wajah. Fallback autentikasi PIN lama di browser bukan bagian setup ini dan tidak diaktifkan dengan mempublikasikan hash. Jumlah pengguna direktori saat setup: 0. Tidak ada migration aplikasi lain yang dijalankan. Aplikasi customer/API yang sudah dideploy tetap berjalan; schema ini tidak memerlukan rebuild frontend.
+
+
 ## Verifikasi layanan aktual — 27 Oktober 2026
 
 Seluruh env backend utama sudah tersedia pada runtime: DATABASE_URL, BETTER_AUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET. Secret auth memenuhi panjang minimal 32 karakter; format client ID Google benar. Nilai credential tidak dicetak atau disalin ke laporan.
