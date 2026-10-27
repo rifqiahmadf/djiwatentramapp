@@ -25,6 +25,7 @@ it("acknowledged shift expenses are locked and skipped on close retries", () => 
 it("keeps modal focus independent from POS shortcuts and hides unsupported QRIS", () => {
 	const menu = source("routes/menu.lazy.tsx");
 	const paymentModal = source("components/pos/payment-modal.tsx");
-	expect(menu).toContain("enabled: !panel && !isSearchFocused");
+	expect(menu).not.toContain("useMenuKeyboardNav");
+	expect(menu).not.toContain("useKeyboardNavigation");
 	expect(paymentModal).toContain("Dynamic Mayar QRIS is not offered in POS");
 });

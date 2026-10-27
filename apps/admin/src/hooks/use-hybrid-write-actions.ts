@@ -1,3 +1,4 @@
+import type { BulkScanResult } from "@yumipos/web-shared/lib/scan-result";
 import { getDisplayOrderNumber } from "@yumipos/web-shared/lib/order-number";
 import { allocateDailyReceiptNo } from "@yumipos/web-shared/lib/daily-receipt";
 import { createClient } from "@/lib/client";
@@ -2282,7 +2283,7 @@ export function useHybridYumiChat() {
 
 export function useHybridBulkScanImageData() {
 	return useCallback(async (args: { images: string[] }) => {
-		return invokeEdgeFunction("yumi-ai", { action: "bulkScanImageData", ...args });
+		return invokeEdgeFunction<BulkScanResult[]>("yumi-ai", { action: "bulkScanImageData", ...args });
 	}, []);
 }
 
@@ -3872,9 +3873,8 @@ export function useHybridCreateTransaction() {
 			if (!sourceId) throw new Error("Gateway returned no sourceId");
 
 				// Fire-and-forget: notify Yumi Finance Analyzer for real-time AI analysis
-				const analyzerUrl = (typeof import.meta !== "undefined" && import.meta.env?.VITE_ANALYZER_URL) ||
-					"http://43.129.54.5:8002";
-				fetch(`${analyzerUrl}/analyze-transaction`, {
+				const analyzerUrl = import.meta.env.VITE_ANALYZER_URL?.trim();
+				if (analyzerUrl) fetch(`${analyzerUrl.replace(/\/+$/, "")}/analyze-transaction`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ source_id: sourceId }),

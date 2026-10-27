@@ -3,9 +3,16 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        "dist/**"
+      ],
       "env": [
         "RESEND_API_KEY",
         "MAYAR_BASE_URL",
@@ -18,18 +25,26 @@
         "SUPABASE_SERVICE_ROLE_KEY",
         "SUPABASE_SECRET_KEY",
         "SUPABASE_JWT_SECRET",
-        "SUPABASE_DATA_API_URL"
+        "SUPABASE_DATA_API_URL",
+        "VITE_*"
       ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": [
+        "^check-types"
+      ]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "VITE_*"
+      ]
     },
     "dev:setup": {
       "cache": false,

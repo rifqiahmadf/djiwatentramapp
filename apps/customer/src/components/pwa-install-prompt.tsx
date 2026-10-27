@@ -178,8 +178,9 @@ export function MobilePortraitGuard() {
     window.addEventListener("resize", update);
 
     const standalone = isStandalone();
-    if (standalone && "orientation" in screen && typeof screen.orientation.lock === "function") {
-      void screen.orientation.lock("portrait").catch(() => undefined);
+    const orientation = screen.orientation as ScreenOrientation & { lock?: (value: "portrait") => Promise<void> };
+    if (standalone && typeof orientation?.lock === "function") {
+      void orientation.lock("portrait").catch(() => undefined);
     }
     return () => {
       media.removeEventListener?.("change", update);

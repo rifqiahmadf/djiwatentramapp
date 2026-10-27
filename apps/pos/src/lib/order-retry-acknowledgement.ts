@@ -25,8 +25,8 @@ function sameNumber(persisted: unknown, requested: unknown) {
 
 /**
  * A header alone is not proof that createOrder finished its separate writes.
- * This deliberately never resumes writes: the existing constraints do not make
- * the whole create operation atomic. An abandoned partial order needs admin
+ * Item writes are never resumed. An optional idempotent settlement RPC may
+ * repair the ledger only after all saved items match. A partial item order needs admin
  * reconciliation against the retained queue payload; never delete/recreate it.
  */
 export async function assertOrderRetryAcknowledgement(

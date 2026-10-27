@@ -1,14 +1,15 @@
+import { publicUrl, publicOrigins } from "../../../../packages/env/src/endpoints";
 import { createAuthClient } from "better-auth/react";
 import { sentinelClient } from "@better-auth/infra/client";
 
-const AUTH_SERVER_URL = "https://api.yumme.id/v1/auth";
-const DJIWA_APP_LOGIN_URL = "https://djiwatentram.yumme.id/masuk";
-const ORDERMIEYAMIN_ORIGIN = "https://ordermieyamin.yumme.id";
+const AUTH_SERVER_URL = publicUrl("VITE_API_ORIGIN", "/v1/auth");
+const DJIWA_APP_LOGIN_URL = publicUrl("VITE_CUSTOMER_ORIGIN", "/masuk");
+const ORDERMIEYAMIN_ORIGIN = publicUrl("VITE_ORDERMIEYAMIN_ORIGIN");
 
 function isSafeOrderMieYaminReturnUrl(value: string) {
   try {
     const url = new URL(value);
-    if (url.origin !== ORDERMIEYAMIN_ORIGIN && url.origin !== "http://localhost:3010") return false;
+    if (url.origin !== ORDERMIEYAMIN_ORIGIN && !publicOrigins("VITE_ADDITIONAL_RETURN_ORIGINS").includes(url.origin)) return false;
     return url.pathname === "/" && url.searchParams.get("stage") === "order" && [...url.searchParams.keys()].every((key) => key === "stage") && !url.hash;
   } catch {
     return false;

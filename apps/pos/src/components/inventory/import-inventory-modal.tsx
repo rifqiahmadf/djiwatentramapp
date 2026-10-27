@@ -555,7 +555,7 @@ export default function ImportInventoryModal({
                             : "bg-muted text-muted-foreground"
                         }`}
                       >
-                        {done && step !== "importing" ? (
+                        {done ? (
                           <Check className="h-3 w-3" />
                         ) : (
                           idx + 1

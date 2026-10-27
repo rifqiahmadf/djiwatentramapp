@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../../packages/env/src/endpoints";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Clock, MapPin, Phone, UtensilsCrossed } from "lucide-react";
@@ -66,7 +67,7 @@ export function CustomerHomeDiscovery({ onMenu, b2bHref }: CustomerHomeDiscovery
   return (
     <div className="space-y-4">
       <motion.a
-        href="https://booking.yumme.id/"
+        href={publicUrl("VITE_BOOKING_ORIGIN", "/")}
         target="_blank"
         rel="noreferrer"
         aria-label="Booking acara dan kolaborasi bersama Djiwa Tentram"

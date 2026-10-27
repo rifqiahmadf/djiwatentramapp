@@ -31,6 +31,7 @@ type DiscountRecord = Record<string, any>;
 type OrderRecord = Record<string, any>;
 type InventoryRecord = Record<string, any>;
 type ShiftReportRecord = {
+	memberBonuses: { name: string; roleName?: string; bonus: number }[];
 	shiftId: string;
 	shiftName: string;
 	notes: string;

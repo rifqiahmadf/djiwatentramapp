@@ -12,10 +12,10 @@ function jsonResponse(body: unknown, status = 200) {
 describe("customer receipt loader", () => {
   it("loads a member receipt through the authenticated customer endpoint", async () => {
     let requestedUrl = "";
-    globalThis.fetch = (async (input) => {
+    globalThis.fetch = Object.assign((async (input: Parameters<typeof fetch>[0]) => {
       requestedUrl = String(input);
       return jsonResponse({ success: true, orders: [{ _id: "order_member", status: "paid" }] });
-    }) as typeof fetch;
+    }), { preconnect() {} }) as typeof fetch;
 
     await expect(loadCustomerReceiptOrder("order_member", [])).resolves.toEqual({ _id: "order_member", status: "paid" });
     expect(requestedUrl).toBe("https://api.djiwatentram.web.id/v1/customer/orders");
@@ -23,10 +23,10 @@ describe("customer receipt loader", () => {
 
   it("loads a guest receipt with its access token", async () => {
     let requestBody = "";
-    globalThis.fetch = (async (_input, init) => {
+    globalThis.fetch = Object.assign((async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
       requestBody = String(init?.body);
       return jsonResponse({ success: true, orders: [{ _id: "order_guest", status: "paid" }] });
-    }) as typeof fetch;
+    }), { preconnect() {} }) as typeof fetch;
     const references: CustomerOrderReference[] = [{ orderId: "order_guest", accessToken: "guest-token-123" }];
 
     await expect(loadCustomerReceiptOrder("order_guest", references)).resolves.toEqual({ _id: "order_guest", status: "paid" });

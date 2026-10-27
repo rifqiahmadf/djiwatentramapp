@@ -64,3 +64,13 @@ result_batch_analyze.txt
 .runtime/
 yumi-supervisor-agent/.yumi_supervisor_cursor.txt
 yumi-supervisor-agent/.shift_recap_cursor.txt
+
+# Private environment backups and authenticated local sessions
+.env-backup/
+*.session
+*.session-journal
+.pending_sessions.json
+.env.development.local
+.env.production.local
+.dev.vars
+.dev.vars.*

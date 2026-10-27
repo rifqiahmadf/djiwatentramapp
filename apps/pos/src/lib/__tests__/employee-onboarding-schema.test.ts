@@ -1,6 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import {
 	buildEmployeeContractTemplate,
+	buildContractVariableContext,
+	replaceContractVariables,
 	buildEmployeeOnboardingPayload,
 	createEmployeeSlug,
 	validateEmployeeOnboardingDraft,
@@ -23,6 +25,7 @@ const validDraft: EmployeeOnboardingDraft = {
 		roleName: "Barista",
 		startDate: "2026-05-01",
 		employmentType: "probation",
+		probationDurationMonths: 12,
 		monthlySalary: 2500000,
 		dailyAllowance: 25000,
 		shiftRate: 100000,
@@ -87,8 +90,8 @@ describe("employee onboarding schema", () => {
 		const contract = buildEmployeeContractTemplate(validDraft.personal, validDraft.employment, "Djiwa Tentram");
 
 		expect(contract.title).toContain("Perjanjian Kerja");
-		expect(contract.plainText).toContain("Fakhri Azzam");
-		expect(contract.plainText).toContain("Barista");
+		expect(replaceContractVariables(contract.plainText, buildContractVariableContext(validDraft.personal, validDraft.employment, "Djiwa Tentram", "Djiwa Tentram"))).toContain("Fakhri Azzam");
+		expect(replaceContractVariables(contract.plainText, buildContractVariableContext(validDraft.personal, validDraft.employment, "Djiwa Tentram", "Djiwa Tentram"))).toContain("Barista");
 		expect(contract.clauses.length >= 5).toBe(true);
 	});
 });

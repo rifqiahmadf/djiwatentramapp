@@ -5,14 +5,13 @@ Requires=docker.service
 
 [Service]
 Type=simple
-User=ubuntu
-WorkingDirectory=/opt/djiwatentramapp/apps/auth-server
-EnvironmentFile=/etc/djiwatentramapp/better-auth.env
-ExecStart=/usr/local/bin/bun src/index.ts
+User=${AUTH_SERVICE_USER}
+WorkingDirectory=${AUTH_SERVICE_WORKDIR}
+EnvironmentFile=${AUTH_SERVICE_ENV_FILE}
+ExecStart=${BUN_EXECUTABLE} src/index.ts
 Restart=always
 RestartSec=5
 
-Environment=BETTER_AUTH_URL=https://api.djiwatentram.web.id
 Environment=BETTER_AUTH_PORT=3001
 
 

@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { createClient } from "@yumipos/web-shared";
 
 // ─── Types ──────────────────────────────────────────────────
@@ -417,7 +418,7 @@ export async function submitClosingViaEdge(params: {
   linkTimestamp?: string | number;
   linkSignature?: string;
 }): Promise<ClosingEdgeResponse> {
-  const supabaseUrl = "https://supabase.yumme.id";
+  const supabaseUrl = publicUrl("VITE_SUPABASE_URL");
   const response = await fetch(`${supabaseUrl}/functions/v1/process-closing`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -498,7 +498,7 @@ function LeaderboardPage() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate({ to: "/$username/beranda" as any, params: { username } })}
+          onClick={() => navigate({ to: "/$username/beranda", params: { username } })}
           aria-label="Kembali ke beranda"
           className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-border bg-card shadow-sm hover:bg-muted transition-colors"
         >

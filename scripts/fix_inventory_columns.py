@@ -3,9 +3,10 @@
 Restrukturisasi kolom tabel inventory Fase 1.
 Makes all changes atomically to inventory.lazy.tsx
 """
+import os
 import re
 
-path = "/opt/djiwatentramapp/apps/web/src/routes/admin/inventory.lazy.tsx"
+path = f"{os.environ['APP_ROOT'].rstrip('/')}/apps/web/src/routes/admin/inventory.lazy.tsx"
 
 with open(path, "r") as f:
     content = f.read()

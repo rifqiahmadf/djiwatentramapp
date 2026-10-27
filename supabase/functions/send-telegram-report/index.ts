@@ -1,6 +1,7 @@
+import { requiredEnv } from "../_shared/env.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const TELEGRAM_BOT_URL = Deno.env.get('TELEGRAM_BOT_URL') || 'http://localhost:8001/send-report'
+const TELEGRAM_BOT_URL = requiredEnv("TELEGRAM_BOT_URL")
 
 serve(async (req) => {
   // Handle CORS preflight

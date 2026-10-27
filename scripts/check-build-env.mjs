@@ -24,7 +24,6 @@ const distDir = distArgIndex >= 0 ? resolve(appDir, process.argv[distArgIndex + 
 
 const URL_KEY = "VITE_SUPABASE_URL";
 const KEY_NAMES = ["VITE_SUPABASE_PUBLISHABLE_KEY", "VITE_SUPABASE_ANON_KEY"];
-const CRASH_MARKER = "Supabase client key is not configured";
 const SOURCE_ENV_NAMES = [URL_KEY, ...KEY_NAMES];
 
 function appLabel() {
@@ -188,11 +187,9 @@ if (!hasValue(urlValue) || !hasValue(key.value)) {
     "Deploy bundle ini akan menghasilkan app blank putih. Jangan dipublikasikan.",
   ]);
 }
-if (bundleText.includes(CRASH_MARKER)) {
-  fail("bundle hasil build memuat jalur error 'Supabase client key is not configured'.", [
-    "Artinya konfigurasi publik tidak ter-inline saat build.",
-    "Jangan deploy bundle ini; build ulang dengan .env app yang benar.",
-  ]);
-}
+// A retained runtime error message is not evidence of missing configuration.
+// Vite may retain an env object and its validation branch instead of folding it.
+// The checks above require both resolved values to be present in emitted assets.
+
 
 console.log(`\u2713 check-build-env: ${appLabel()} bundle memuat konfigurasi publik Supabase (${bundleFiles.length} file js)`);

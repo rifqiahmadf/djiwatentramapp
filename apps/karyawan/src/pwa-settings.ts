@@ -11,5 +11,4 @@
 	"orientation": "portrait",
 	"icon192": "/pwa-192x192.png",
 	"icon512": "/pwa-512x512.png"
-};
-	
+} as const;

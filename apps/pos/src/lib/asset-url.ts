@@ -1,4 +1,5 @@
-const activeStorageOrigin = "https://supabase.djiwatentram.web.id";
+import { publicUrl } from "../../../../packages/env/src/endpoints";
+const activeStorageOrigin = publicUrl("VITE_SUPABASE_URL");
 const activeStorageHost = new URL(activeStorageOrigin).host;
 const legacyStorageHosts = new Set([
 	new URL("https://xaemykhjpkgypqqpfdcb.supabase.co").host,

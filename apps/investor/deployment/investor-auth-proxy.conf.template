@@ -1,7 +1,7 @@
 # Included inside the djiwatentram.yumme.id server block.
 # Keep Better Auth and investor aggregate APIs on the auth-server origin.
 location ^~ /api/investor-auth/ {
-    proxy_pass http://localhost:3001/api/investor-auth/;
+    proxy_pass ${AUTH_INTERNAL_ORIGIN}/api/investor-auth/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection 'upgrade';
@@ -13,7 +13,7 @@ location ^~ /api/investor-auth/ {
 }
 
 location ^~ /api/investor/ {
-    proxy_pass http://localhost:3001/api/investor/;
+    proxy_pass ${AUTH_INTERNAL_ORIGIN}/api/investor/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection 'upgrade';

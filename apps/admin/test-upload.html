@@ -9,8 +9,8 @@
 </div>
 <div id="result"></div>
 <script>
-const ANON_KEY = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJyb2xlIjogImFub24iLCAiaXNzIjogInN1cGFiYXNlIiwgImlhdCI6IDE3ODMxNTA5MzAsICJleHAiOiAyMDk4NTEwOTMwfQ.SGrZqj-wuzvgSUGTapezvq2P-U45ifEseS9cR0R9Pas";
-const BASE_URL = "https://supabase.yumme.id";
+const ANON_KEY = "%VITE_SUPABASE_PUBLISHABLE_KEY%";
+const BASE_URL = "%VITE_SUPABASE_URL%";
 
 document.getElementById("uploadBtn").onclick = async () => {
   const file = document.getElementById("fileInput").files[0];

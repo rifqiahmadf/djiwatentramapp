@@ -116,6 +116,7 @@ type ShiftStatusRecord = {
 	latestMulai: number;
 	latestAkhir: number;
 	shiftInfo: {
+		startTime?: number;
 		cashierName?: string;
 		shiftName?: string;
 		shiftId?: string;
@@ -255,6 +256,13 @@ type DashboardStatsRecord = {
 		createdAt: number;
 		customerName: string | null;
 		paymentMethod: string | null;
+		dailyReceiptNo?: number | null;
+		source?: string | null;
+		sourceApp?: string | null;
+		businessUnit?: string | null;
+		orderType?: string | null;
+		platform?: string | null;
+		brandSlug?: string | null;
 	}>;
 	cashDiscrepancySummary: {
 		totalPhysicalGap: number;
@@ -1796,6 +1804,7 @@ export async function fetchShiftStatus() {
 		latestMulai: ongoingShift?.startTime ?? latestCompletedShift?.startTime ?? 0,
 		latestAkhir: ongoingShift ? 0 : latestCompletedShift?.endTime ?? 0,
 		shiftInfo: {
+			startTime: ongoingShift?.startTime ?? latestCompletedShift?.startTime,
 			cashierName: ongoingShift?.cashierName ?? latestCompletedShift?.cashierName,
 			shiftName: ongoingShift?.shiftName ?? latestCompletedShift?.shiftName,
 			shiftId: ongoingShift?._id,
@@ -2022,6 +2031,14 @@ async function fetchDashboardStats() {
 		.slice(0, 10)
 		.map((order) => ({
 			_id: order._id,
+			dailyReceiptNo: order.dailyReceiptNo ?? order.daily_receipt_no ?? null,
+			source: order.source ?? null,
+			sourceApp: order.sourceApp ?? null,
+			businessUnit: order.businessUnit ?? null,
+			orderType: order.orderType ?? null,
+			platform: order.platform ?? null,
+			brandSlug: order.brandSlug ?? order.brand_slug ?? null,
+
 			orderNumber: order.orderNumber ?? "N/A",
 			totalAmount: order.totalAmount ?? 0,
 			status: order.status,

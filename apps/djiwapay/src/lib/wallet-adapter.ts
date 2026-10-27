@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import type { WalletLedgerEntry, WalletSummary } from "@yumipos/djiwapay-core";
 import type { WalletWithdrawalDraft } from "./djiwa-pay-withdrawal";
 export type WalletResponse = { wallet: WalletSummary; ledger: WalletLedgerEntry[]; transactions?: WalletTransaction[] };
@@ -47,8 +48,24 @@ export async function markAllWalletNotificationsRead(): Promise<void> {
 }
 
 export type PpobProduct = { product_code: string; product_description: string; product_nominal: string; product_details?: string; product_price: number; product_type: string; status: string; icon_url?: string };
+export function ppobProductName(product: PpobProduct): string {
+  const nominal = product.product_nominal.trim();
+  if (/^\d+$/.test(nominal)) return `Paket ${new Intl.NumberFormat("id-ID").format(Number(nominal))}`;
+  return nominal || product.product_description;
+}
+
+export async function resolveWalletRecipient(phone: string): Promise<{ success: boolean; recipient?: { name: string; phone: string } }> {
+  const response = await fetch("/api/pay-bridge/wallet", {
+    method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "resolve-recipient", phone }),
+  });
+  const payload = await response.json().catch(() => ({})) as { success?: boolean; error?: string; recipient?: { name: string; phone: string } };
+  if (!response.ok || !payload.success || !payload.recipient) throw new Error(payload.error || "RECIPIENT_NOT_FOUND");
+  return { success: true, recipient: payload.recipient };
+}
+
 export async function readPpobCatalog(): Promise<PpobProduct[]> {
-  const response = await fetch("https://api.djiwatentram.web.id/api/ppob/iak/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "price-list" }) });
+  const response = await fetch(publicUrl("VITE_API_ORIGIN", "/api/ppob/iak/"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "price-list" }) });
   if (!response.ok) throw new Error("Katalog PPOB tidak dapat dimuat");
   const payload = await response.json() as { success?: boolean; data?: { data?: { pricelist?: PpobProduct[] } } };
   const products = payload.data?.data?.pricelist;

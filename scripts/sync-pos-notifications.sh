@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-ENV_FILE="/opt/supabase-selfhost/.env"
-ENDPOINT="https://supabase.yumme.id/functions/v1/pos-notifications"
+ENV_FILE="${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/.env"
+ENDPOINT="${SUPABASE_URL:?Set SUPABASE_URL}/functions/v1/pos-notifications"
 
 [ -r "$ENV_FILE" ] || exit 0
 SERVICE_KEY="$(grep -E '^(SERVICE_KEY|YUMI_SERVICE_ROLE_KEY|SUPABASE_SERVICE_ROLE_KEY)=' "$ENV_FILE" | head -n1 | cut -d= -f2-)"

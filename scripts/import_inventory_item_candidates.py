@@ -16,8 +16,7 @@ import urllib.request
 from pathlib import Path
 
 DEFAULT_INPUT = Path(
-    "/opt/djiwatentramapp/.hermes/plans/"
-    "2026-08-26_receipt-item-web-research-small-batches.json"
+    f"{os.environ['APP_ROOT'].rstrip('/')}/.hermes/plans/2026-08-26_receipt-item-web-research-small-batches.json"
 )
 
 

@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 
 logger = logging.getLogger("yumi-finance.sumopod")
 
-SUMODOP_BASE = os.getenv("NINEROUTER_BASE_URL", "http://127.0.0.1:20128/v1")
+SUMODOP_BASE = os.environ["NINEROUTER_BASE_URL"].rstrip("/")
 VISION_MODEL = os.getenv("NINEROUTER_VISION_MODEL") or os.getenv("SUMOPOD_VISION_MODEL", "ag/gemini-3-flash")
 TEXT_MODEL = os.getenv("NINEROUTER_TEXT_MODEL") or os.getenv("SUMOPOD_TEXT_MODEL", "ag/gemini-3-flash")
 WIB = timezone(timedelta(hours=7))

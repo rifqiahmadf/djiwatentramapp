@@ -1,3 +1,4 @@
+import { createVendorChunks } from "../../packages/config/vendor-chunks";
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
@@ -5,6 +6,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+ build: { rollupOptions: { output: { manualChunks: createVendorChunks(), onlyExplicitManualChunks: true } } },
   plugins: [
     react(),
     tailwindcss(),

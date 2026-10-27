@@ -1,3 +1,5 @@
+import { modularTensorflowCore } from "../../packages/config/tensorflow-core";
+import { createVendorChunks } from "../../packages/config/vendor-chunks";
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
@@ -7,9 +9,10 @@ import { defineConfig } from "vite";
 import { posPwaSettings } from "./src/pwa-settings";
 
 export default defineConfig({
+ build: { rollupOptions: { output: { manualChunks: createVendorChunks(), onlyExplicitManualChunks: true } } },
 	plugins: [
+		TanStackRouterVite({ autoCodeSplitting: true }),
 		react(),
-		TanStackRouterVite(),
 		tailwindcss(),
 		VitePWA({
 			registerType: "autoUpdate",
@@ -75,6 +78,7 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
+      "@tensorflow/tfjs-core": modularTensorflowCore(__dirname),
 			"@": path.resolve(__dirname, "./src"),
 		},
 	},

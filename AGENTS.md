@@ -10,10 +10,14 @@ Prefer Supabase MCP/CLI workflows for schema and data changes.
 
 ## Canonical deployment target
 
-For this `djiwatentramapp` repository, all app deployments use the T3-connected SSH host `djiwa-vps` only. Do not use the unrelated Dalang/Zantara VPS for this project.
+The user-selected deployment target is Dokploy at `https://dokploy.byrifqi.com`.
+Use `*.byrifqi.com` for this deployment. Customer uses `app.byrifqi.com` and
+API uses `api.byrifqi.com`; see `deploy/dokploy/README.md` for the full mapping.
+The previous `djiwa-vps`/`*.djiwatentram.web.id` deployment is legacy and must not
+be used for this requested rollout.
 
-- Production checkout: `/opt/djiwatentramapp`
-- Canonical domain family: `*.djiwatentram.web.id`
-- Customer webroot: `/opt/djiwatentramapp/apps/customer/dist`
-- Other app webroots follow `/opt/djiwatentramapp/apps/<app>/dist`
-- Verify the VPS host, checkout path, domain, and deployed `version.json` before declaring a deployment complete.
+- Repository: `rifqiahmadf/djiwatentramapp`, branch `main`.
+- Keep credentials in environment/secret settings, never source or build contexts.
+- Commit/push and deployment are authorized after required environment setup is complete.
+- Check the matching database schema, selected Dokploy project/services, domain routing,
+  TLS, and an application request before declaring deployment complete.

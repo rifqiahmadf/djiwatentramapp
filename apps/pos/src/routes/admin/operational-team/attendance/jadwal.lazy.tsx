@@ -1024,9 +1024,11 @@ function AttendanceJadwalPage() {
       );
     } else {
       // Duplicate default: selalu buat baru di target
+      const assignedUserId = targetUserId ?? schedule.userId;
+      if (!assignedUserId) { toast.error("Pilih karyawan untuk jadwal yang diduplikasi"); return; }
       withSaveToast(
         () => handleSave({
-          userId: targetUserId ?? schedule.userId,
+          userId: assignedUserId,
           date: targetDate,
           shiftName: schedule.shiftName,
           startTime: schedule.startTime ?? undefined,

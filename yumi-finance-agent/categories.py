@@ -578,7 +578,7 @@ async def ai_categorize_item(
     )
 
     try:
-        base_url = os.getenv("NINEROUTER_BASE_URL", "http://127.0.0.1:20128/v1")
+        base_url = os.environ["NINEROUTER_BASE_URL"].rstrip("/")
         api_key = os.getenv("SUMOPOD_API_KEY", "")
         model = os.getenv("NINEROUTER_TEXT_MODEL", "ag/gemini-3-flash")
 

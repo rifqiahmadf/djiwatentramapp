@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, BarChart3, Building2, CheckCircle2, Clock3, LockKeyhole, LogOut, RefreshCw, ShieldCheck, TriangleAlert } from "lucide-react";
@@ -22,7 +23,7 @@ type InvestorMetrics = {
   completeness: "available" | "partial" | "unavailable";
 };
 
-const API_BASE = import.meta.env.VITE_INVESTOR_API_URL?.trim() || "https://api.yumme.id";
+const API_BASE = import.meta.env.VITE_INVESTOR_API_URL?.trim() || publicUrl("VITE_API_ORIGIN");
 
 function formatRupiah(value: number | null | undefined) {
   if (value == null || !Number.isFinite(value)) return "Belum tersedia";

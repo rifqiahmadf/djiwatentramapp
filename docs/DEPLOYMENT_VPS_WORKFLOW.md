@@ -24,7 +24,7 @@ Jangan menaruh IP private/public, password, API key, connection string, atau tok
 - Database migrations dan SQL: migration directory yang digunakan repository, saat ini `supabase/migrations/`
 - Edge/integration functions: `supabase/functions/`
 - Nginx production frontend: `/etc/nginx/sites-enabled/djiwapay.conf`
-- Auth systemd unit backend: `apps/auth-server/better-auth.service` pada VPS backend
+- Auth systemd unit backend: `apps/auth-server/better-auth.service.template` pada VPS backend
 - IAK secrets: Supabase Edge Function secrets `IAK_USERNAME`, `IAK_API_KEY`, optional `IAK_BASE_URL`
 
 `AGENTS.md` tetap menjadi instruksi utama untuk perubahan backend. Sebelum menjalankan migration, pastikan targetnya adalah PostgreSQL production pada VPS database/backend yang benar, bukan project Supabase cloud yang berbeda.

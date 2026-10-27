@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../../packages/env/src/endpoints";
 import { createLazyFileRoute, Outlet, useLocation, useMatches, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LogIn, ShieldCheck } from "lucide-react";
@@ -93,8 +94,8 @@ function MemberHomePage() {
 
 	const storeName = import.meta.env.VITE_BRAND_NAME || "Djiwatentram";
 	const logoUrl = siteSettings?.logoUrl || "/logo-djiwa.png";
-	const b2bChannelHref = isAuthenticated && customer ? `https://b2b.djiwatentram.web.id/${encodeURIComponent(username)}/order?step=menu` : "https://b2b.djiwatentram.web.id/daftar";
-	const merchandiseChannelHref = isAuthenticated && customer ? `https://merchandise.djiwatentram.web.id/${encodeURIComponent(username)}/order?step=menu` : "https://merchandise.djiwatentram.web.id/daftar";
+	const b2bChannelHref = isAuthenticated && customer ? `${publicUrl("VITE_B2B_ORIGIN")}/${encodeURIComponent(username)}/order?step=menu` : publicUrl("VITE_B2B_ORIGIN", "/daftar");
+	const merchandiseChannelHref = isAuthenticated && customer ? `${publicUrl("VITE_MERCHANDISE_ORIGIN")}/${encodeURIComponent(username)}/order?step=menu` : publicUrl("VITE_MERCHANDISE_ORIGIN", "/daftar");
 
 	const matches = useMatches();
 	const isChildRoute = matches.some(m => m.routeId.startsWith("/$username/") && m.routeId !== "/$username");
@@ -105,7 +106,7 @@ function MemberHomePage() {
 		if (typeof window !== "undefined") window.location.assign(path);
 	};
 	const goDjiwaPay = () => {
-		if (typeof window !== "undefined") window.location.assign(`https://api.djiwatentram.web.id/api/customer/pay-bridge/start?returnTo=${encodeURIComponent("https://pay.djiwatentram.web.id/?source=customer&username=${encodeURIComponent(username)}")}`);
+		if (typeof window !== "undefined") window.location.assign(`${publicUrl("VITE_API_ORIGIN")}/api/customer/pay-bridge/start?returnTo=${encodeURIComponent(`${publicUrl("VITE_PAY_ORIGIN")}/?source=customer&username=${encodeURIComponent(username)}`)}`);
 	};
 	const customerNav = [
 		{ label: "Home", icon: <Djiwa3DIcon name="navigation-home" size="micro" alt="" className="h-5 w-5 object-contain" />, active: location.pathname === `/${username}`, onSelect: () => goCustomerPath(`/${encodeURIComponent(username)}`) },
@@ -296,7 +297,7 @@ function MemberHomePage() {
 							onHistory={() => navigate({ to: "/$username/riwayat", params: { username } })}
 							onCommunity={() => navigate({ to: "/$username/komunitas", params: { username } })}
 							onMerchandise={() => window.location.assign(merchandiseChannelHref)}
-							onBooking={() => window.location.assign("https://booking.djiwatentram.web.id/")}
+							onBooking={() => window.location.assign(publicUrl("VITE_BOOKING_ORIGIN", "/"))}
 							onDjiwaRun={() => navigate({ to: "/$username/run", params: { username } })}
 						/>
 						{!isCurrentGuest ? <p className="text-center text-[10px] text-muted-foreground">Halaman ini milik {guestData.name}. <button type="button" className="font-bold underline" onClick={() => navigate({ to: "/daftar" })}>Mulai sebagai dirimu</button></p> : null}
@@ -363,7 +364,7 @@ function MemberHomePage() {
 							onHistory={() => navigate({ to: "/$username/riwayat", params: { username } })}
 							onCommunity={() => navigate({ to: "/$username/komunitas", params: { username } })}
 							onMerchandise={() => window.location.assign(merchandiseChannelHref)}
-							onBooking={() => window.location.assign("https://booking.djiwatentram.web.id/")}
+							onBooking={() => window.location.assign(publicUrl("VITE_BOOKING_ORIGIN", "/"))}
 							onDjiwaRun={() => navigate({ to: "/$username/run", params: { username } })}
 						/>
 						<RecentOrdersCarousel username={username} />

@@ -20,8 +20,8 @@ from urllib.error import URLError
 from datetime import datetime, timezone, timedelta
 
 # ─── Config ────────────────────────────────────────────────────
-ENV_PATH = "/opt/djiwatentramapp/yumi-ai-bot/.env"
-SUPABASE_URL = "https://supabase.yumme.id"
+ENV_PATH = f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-ai-bot/.env"
+SUPABASE_URL = f"{os.environ['SUPABASE_URL'].rstrip('/')}"
 WIB = timezone(timedelta(hours=7))
 
 def load_env():
@@ -138,19 +138,7 @@ def build_welcome(app):
     langkah = ""
     if telegram_code:
         langkah = (
-            "\U0001f4cc Yang Perlu Kamu Lakukan:\n"
-            "  1. Buka Telegram, cari @yumihrdbot\n"
-            f"  2. Ketik perintah: /daftar {telegram_code}\n"
-            "  3. Kalau berhasil, bot akan membalas dengan data kamu\n"
-            "  4. Selesai! Kamu sudah bisa:\n"
-            "     \u2022 Absen masuk / keluar lewat Telegram\n"
-            "     \u2022 Menerima notifikasi order di grup yang sesuai\n"
-            "     \u2022 Melihat jadwal shift kamu\n"
-            "\n"
-            "\U0001f4a1 Tips:\n"
-            "  \u2022 Jangan lupa login ke aplikasi POS di https://pos.yumme.id\n"
-            "  \u2022 Username dan password sudah diberikan oleh admin\n"
-            "  \u2022 Kalau ada kendala, tanyakan ke tim manajemen ya"
+            f"📌 Yang Perlu Kamu Lakukan:\n  1. Buka Telegram, cari @yumihrdbot\n  2. Ketik perintah: /daftar {telegram_code}\n  3. Kalau berhasil, bot akan membalas dengan data kamu\n  4. Selesai! Kamu sudah bisa:\n     • Absen masuk / keluar lewat Telegram\n     • Menerima notifikasi order di grup yang sesuai\n     • Melihat jadwal shift kamu\n\n💡 Tips:\n  • Jangan lupa login ke aplikasi POS di {os.environ['POS_ORIGIN'].rstrip('/')}\n  • Username dan password sudah diberikan oleh admin\n  • Kalau ada kendala, tanyakan ke tim manajemen ya"
         )
 
     closing = (

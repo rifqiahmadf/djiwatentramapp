@@ -31,7 +31,7 @@ function database(fixture: Fixture = {}) {
 	let financeRows = fixture.finance ?? [settlement];
 	const client = createClient("https://pos.test", "test-key", {
 		auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-		global: { fetch: async (input, init) => {
+		global: { fetch: Object.assign(async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
 			const url = new URL(String(input));
 			const method = init?.method ?? "GET";
 			const body = init?.body ? JSON.parse(String(init.body)) : undefined;
@@ -66,7 +66,7 @@ function database(fixture: Fixture = {}) {
 				if (fixture.newOrder && ["orders", "order_items", "financial_transactions"].includes(table ?? "")) return new Response(null, { status: 201 });
 			}
 			throw new Error(`Unexpected database request: ${method} ${url.pathname}`);
-		} },
+		}, { preconnect() {} }) },
 	});
 	return { client, requests };
 }
@@ -80,6 +80,11 @@ async function orderAction(client: ReturnType<typeof database>["client"]) {
 	assert.ok(hook);
 	const compiled = ts.transpileModule(hook.getText(file), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
 	const dependencies = {
+		// Assert the expected rejection log without printing intentional error stacks.
+		console: { ...console, error: (...args: unknown[]) => {
+			expect(args[0]).toBe("[supabase-hybrid:write-create-order] fallback disabled");
+			expect(args[1]).toBeInstanceOf(Error);
+		} },
 		useMutation: () => () => { throw new Error("Unexpected fallback"); }, api: { orders: {} },
 		useYumiAuth: () => ({ user: { _id: "cashier" } }),
 		useHybridDeductOrderInventory: () => async () => ({ deductedCount: 0, skippedCount: 0 }),

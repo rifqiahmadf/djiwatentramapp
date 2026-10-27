@@ -5,11 +5,11 @@ from datetime import datetime, timezone, timedelta
 from PIL import Image
 import httpx
 
-sys.path.insert(0, '/opt/djiwatentramapp/yumi-finance-agent')
+sys.path.insert(0, f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-finance-agent")
 from sumopod_client import SumoPodClient
 
 WIB = timezone(timedelta(hours=7))
-SUPABASE_URL = "https://supabase.yumme.id"
+SUPABASE_URL = f"{os.environ['SUPABASE_URL'].rstrip('/')}"
 SERVICE_KEY = None  # will load below
 MAX_IMAGE_SIZE = 2400
 JPEG_QUALITY = 88
@@ -47,7 +47,7 @@ async def main():
     SERVICE_KEY = r.stdout.strip()
 
     # Load sumopod key from .env
-    with open('/opt/djiwatentramapp/yumi-finance-agent/.env') as f:
+    with open(f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-finance-agent/.env") as f:
         for line in f:
             if line.startswith('SUMOPOD_API_KEY='):
                 os.environ['SUMOPOD_API_KEY'] = line.split('=', 1)[1].strip()

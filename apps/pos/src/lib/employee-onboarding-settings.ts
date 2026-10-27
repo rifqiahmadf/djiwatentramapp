@@ -120,7 +120,7 @@ export const DEFAULT_EMPLOYEE_ONBOARDING_SETTINGS: EmployeeOnboardingSettings = 
 	registrationMode: "public",
 	inviteCode: "",
 	closedMessage: "Saat ini pendaftaran karyawan baru sedang tidak dibuka. Silakan hubungi admin untuk informasi lebih lanjut.",
-	defaultPassword: "djiwatentram123",
+	defaultPassword: "",
 	defaultRoleId: "",
 	defaultEmploymentType: "probation",
 	defaultLocation: "Djiwa Tentram",

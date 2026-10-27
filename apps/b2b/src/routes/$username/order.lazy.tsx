@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../../packages/env/src/endpoints";
 import { B2B_BRAND_SLUG } from "@/lib/marketplace-config";
 import {
 	Bell,
@@ -1043,7 +1044,7 @@ function OrderPage() {
 				{step !== "checkout" && !cartOpen && !serviceOpen && !scannerOpen && !productSheet ? (
 					<div className="app-bottom-bar fixed inset-x-0 bottom-0 z-30 mx-auto max-w-md px-2 pb-2 pt-1.5">
 						<div className="app-card grid grid-cols-4 gap-1.5 p-1.5">
-							<BottomButton label="Djiwa App" icon={<Djiwa3DIcon name="navigation-home" size="micro" alt="" className="h-5 w-5 object-contain" />} onClick={() => window.location.assign(`https://djiwatentram.yumme.id/${encodeURIComponent(username)}`)} />
+							<BottomButton label="Djiwa App" icon={<Djiwa3DIcon name="navigation-home" size="micro" alt="" className="h-5 w-5 object-contain" />} onClick={() => window.location.assign(`${publicUrl("VITE_CUSTOMER_ORIGIN")}/${encodeURIComponent(username)}`)} />
 							<BottomButton label="Menu" icon={<Djiwa3DIcon name="navigation-home" size="micro" alt="" className="h-5 w-5 object-contain" />} onClick={() => setStep("menu")} />
 							<BottomButton label="Keranjang" icon={<Djiwa3DIcon name="navigation-order" size="micro" alt="" className="h-5 w-5 object-contain" />} onClick={() => setCartOpen(true)} badge={totalItems > 0 ? String(totalItems) : undefined} />
 							<BottomButton label={receipt ? "Struk" : "Checkout"} icon={<Djiwa3DIcon name="order-receipt" size="micro" alt="" className="h-5 w-5 object-contain" />} onClick={() => goToOrderStep(receipt ? "receipt" : "delivery")} primary disabled={!receipt && (step !== "menu" || !cart.length)} />

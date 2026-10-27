@@ -11,4 +11,4 @@ export const customerPwaSettings = {
 	"orientation": "portrait",
 	"icon192": "/pwa-app-192.png",
 	"icon512": "/pwa-app-512.png"
-};
+} as const;

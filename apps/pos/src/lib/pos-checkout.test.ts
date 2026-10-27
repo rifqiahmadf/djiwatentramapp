@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import type { CheckoutDraft, CheckoutCustomerInfo } from "./pos-checkout";
 import {
 	createCheckoutDraft,
 	createCustomerInfo,
@@ -10,7 +11,7 @@ import {
 
 describe("checkout draft recovery", () => {
 	it("restores customer, payment, cash, phase and team after refresh", () => {
-		const customerInfo = {
+		const customerInfo: CheckoutCustomerInfo = {
 			...createCustomerInfo(),
 			name: "Ayu",
 			orderType: "online",
@@ -19,7 +20,7 @@ describe("checkout draft recovery", () => {
 			platform: "grab",
 			email: "ayu@example.com",
 		};
-		const checkout = {
+		const checkout: CheckoutDraft = {
 			...createCheckoutDraft(),
 			step: "payment",
 			paymentMethod: "tunai",

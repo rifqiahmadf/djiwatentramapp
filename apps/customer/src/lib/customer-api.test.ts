@@ -26,10 +26,10 @@ afterEach(() => {
 describe("customer API boundary", () => {
   it("builds an authenticated member orders request", async () => {
     let request: { input: RequestInfo | URL; init?: RequestInit } | undefined;
-    globalThis.fetch = (async (input, init) => {
+    globalThis.fetch = Object.assign((async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
       request = { input, init };
       return jsonResponse({ success: true, orders: [{ _id: "order_1" }] });
-    }) as typeof fetch;
+    }), { preconnect() {} }) as typeof fetch;
 
     await expect(fetchMemberOrders()).resolves.toEqual([{ _id: "order_1" }]);
     expect(String(request?.input)).toBe(`${CUSTOMER_API_BASE}/orders`);
@@ -39,10 +39,10 @@ describe("customer API boundary", () => {
 
   it("builds a token-bound guest orders request", async () => {
     let request: { input: RequestInfo | URL; init?: RequestInit } | undefined;
-    globalThis.fetch = (async (input, init) => {
+    globalThis.fetch = Object.assign((async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
       request = { input, init };
       return jsonResponse({ success: true, orders: [{ _id: "order_guest" }] });
-    }) as typeof fetch;
+    }), { preconnect() {} }) as typeof fetch;
     const references: CustomerOrderReference[] = [{ orderId: "order_guest", accessToken: "guest-token-123" }];
 
     await expect(fetchGuestOrders(references)).resolves.toEqual([{ _id: "order_guest" }]);
@@ -54,20 +54,20 @@ describe("customer API boundary", () => {
   });
 
   it("selects the authorized order detail from member results", async () => {
-    globalThis.fetch = (async () => jsonResponse({
+    globalThis.fetch = Object.assign((async () => jsonResponse({
       success: true,
       orders: [{ source_id: "order_other" }, { source_id: "order_target", status: "paid" }],
-    })) as typeof fetch;
+    })), { preconnect() {} }) as typeof fetch;
 
     await expect(fetchCustomerOrderById("order_target", [])).resolves.toEqual({ source_id: "order_target", status: "paid" });
   });
 
   it("uses the guest token when selecting a guest order detail", async () => {
     let requestBody = "";
-    globalThis.fetch = (async (_input, init) => {
+    globalThis.fetch = Object.assign((async (_input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
       requestBody = String(init?.body);
       return jsonResponse({ success: true, orders: [{ _id: "order_guest", status: "paid" }] });
-    }) as typeof fetch;
+    }), { preconnect() {} }) as typeof fetch;
     const references: CustomerOrderReference[] = [{ orderId: "order_guest", accessToken: "guest-token-123" }];
 
     await expect(fetchCustomerOrderById("order_guest", references)).resolves.toEqual({ _id: "order_guest", status: "paid" });
@@ -76,10 +76,10 @@ describe("customer API boundary", () => {
 
   it("uses the Djiwa origin for push requests", async () => {
     const calls: Array<{ input: RequestInfo | URL; init?: RequestInit }> = [];
-    globalThis.fetch = (async (input, init) => {
+    globalThis.fetch = Object.assign((async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
       calls.push({ input, init });
       return new Response(null, { status: 200 });
-    }) as typeof fetch;
+    }), { preconnect() {} }) as typeof fetch;
 
     await subscribeCustomerPush({ endpoint: "https://push.example/sub", keys: { p256dh: "p", auth: "a" } });
     await unsubscribeCustomerPush("https://push.example/sub");
@@ -92,7 +92,7 @@ describe("customer API boundary", () => {
   });
 
   it("throws when the customer API rejects a response", async () => {
-    globalThis.fetch = (async () => new Response(JSON.stringify({ error: "UNAUTHORIZED" }), { status: 401 })) as typeof fetch;
+    globalThis.fetch = Object.assign((async () => new Response(JSON.stringify({ error: "UNAUTHORIZED" }), { status: 401 })), { preconnect() {} }) as typeof fetch;
 
     await expect(fetchMemberOrders()).rejects.toThrow("Customer API HTTP 401");
   });

@@ -1,9 +1,10 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { createAuthClient } from "better-auth/react";
 
-export const authClient = createAuthClient({ baseURL: "https://api.djiwatentram.web.id/api/auth", fetchOptions: { credentials: "include" } });
+export const authClient = createAuthClient({ baseURL: publicUrl("VITE_API_ORIGIN", "/api/auth"), fetchOptions: { credentials: "include" } });
 export type CustomerProfile = { source_id: string; name: string | null; email: string | null; phone?: string | null; wallet_status?: "active" | "blocked" };
-const BRIDGE_START = "https://api.djiwatentram.web.id/api/customer/pay-bridge/start";
-const CUSTOMER_AUTH_ORIGIN = "https://djiwatentram.web.id/masuk";
+const BRIDGE_START = publicUrl("VITE_API_ORIGIN", "/api/customer/pay-bridge/start");
+const CUSTOMER_AUTH_ORIGIN = publicUrl("VITE_CUSTOMER_ORIGIN", "/masuk");
 export type PayNavigationContext = { source: "customer"; username: string } | null;
 export function getPayNavigationContext(): PayNavigationContext {
   const params = new URLSearchParams(window.location.search);

@@ -2,10 +2,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = process.cwd();
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://xaemykhjpkgypqqpfdcb.supabase.co";
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 const SUPABASE_BUCKET = process.env.VITE_SUPABASE_STORAGE_BUCKET || "app-assets";
-const CONVEX_URL = process.env.CONVEX_DEPLOYMENT_URL || "https://moonlit-ox-799.convex.cloud";
+const CONVEX_URL = process.env.CONVEX_DEPLOYMENT_URL;
+if (!SUPABASE_URL || !CONVEX_URL) throw new Error("Set VITE_SUPABASE_URL and CONVEX_DEPLOYMENT_URL before migrating storage");
 
 if (!SUPABASE_KEY) {
 	throw new Error("Missing VITE_SUPABASE_PUBLISHABLE_KEY in environment");

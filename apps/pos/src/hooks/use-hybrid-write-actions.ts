@@ -1,3 +1,4 @@
+import type { BulkScanResult } from "@yumipos/web-shared/lib/scan-result";
 import { getDisplayOrderNumber } from "@yumipos/web-shared/lib/order-number";
 import { allocateDailyReceiptNo } from "@yumipos/web-shared/lib/daily-receipt";
 import { createClient } from "@/lib/client";
@@ -2345,7 +2346,7 @@ export function useHybridYumiChat() {
 
 export function useHybridBulkScanImageData() {
 	return useCallback(async (args: { images: string[] }) => {
-		return invokeEdgeFunction("yumi-ai", { action: "bulkScanImageData", ...args });
+		return invokeEdgeFunction<BulkScanResult[]>("yumi-ai", { action: "bulkScanImageData", ...args });
 	}, []);
 }
 
@@ -2540,6 +2541,14 @@ export function useHybridCreateOrder() {
 			const orderCreatedAt = Number(args?.createdAt ?? Date.now());
 			const idempotencyKey = String(args?.idempotencyKey ?? "").trim() || null;
 			const isOpenBill = Boolean(args?.isOpenBill);
+            const repairSettlement = async (orderId: string) => {
+                const { error } = await pos.rpc("repair_pos_order_settlement", { p_order_id: orderId });
+                if (error) throw error;
+            };
+            const retryRequest = (orderId: string) => ({
+                ...args,
+                repairMissingSettlement: args?.source === "pos" ? () => repairSettlement(orderId) : undefined,
+            });
 
 			if (idempotencyKey) {
 				const { data: existingOrder, error: existingError } = await pos
@@ -2549,7 +2558,7 @@ export function useHybridCreateOrder() {
 					.maybeSingle();
 				if (existingError) throw existingError;
 				if (existingOrder?.source_id) {
-					await assertOrderRetryAcknowledgement(pos, existingOrder, args);
+					await assertOrderRetryAcknowledgement(pos, existingOrder, retryRequest(existingOrder.source_id));
 					return existingOrder.source_id;
 				}
 			}
@@ -2653,7 +2662,7 @@ const orderRow = {
 							.maybeSingle();
 						if (concurrentError) throw concurrentError;
 						if (concurrentOrder?.source_id) {
-							await assertOrderRetryAcknowledgement(pos, concurrentOrder, args);
+							await assertOrderRetryAcknowledgement(pos, concurrentOrder, retryRequest(concurrentOrder.source_id));
 							return concurrentOrder.source_id;
 						}
 					}
@@ -2684,8 +2693,11 @@ const orderRow = {
 					if (itemsError) throw itemsError;
 				}
 
-				if (!isOpenBill) {
-					const financialRow = {
+                if (!isOpenBill) {
+                    if (args?.source === "pos") {
+                        await repairSettlement(orderId);
+                    } else {
+                        const financialRow = {
 						source_id: makeSourceId("fin"),
 						tx_type: "income",
 						amount: orderRow.total_amount,
@@ -2711,7 +2723,8 @@ const orderRow = {
 						.from("financial_transactions")
 						.insert(financialRow);
 					if (financialError) throw financialError;
-				}
+                    }
+                }
 
 				// Auto-deduct inventory untuk order completed (direct create)
 				if (nextStatus === "completed" || nextStatus === "paid") {
@@ -3948,9 +3961,8 @@ export function useHybridCreateTransaction() {
 			if (!sourceId) throw new Error("Gateway returned no sourceId");
 
 				// Fire-and-forget: notify Yumi Finance Analyzer for real-time AI analysis
-				const analyzerUrl = (typeof import.meta !== "undefined" && import.meta.env?.VITE_ANALYZER_URL) ||
-					"http://43.129.54.5:8002";
-				fetch(`${analyzerUrl}/analyze-transaction`, {
+				const analyzerUrl = import.meta.env.VITE_ANALYZER_URL?.trim();
+				if (analyzerUrl) fetch(`${analyzerUrl.replace(/\/+$/, "")}/analyze-transaction`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ source_id: sourceId }),

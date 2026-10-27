@@ -1,3 +1,4 @@
+import { serverUrl, envOrigins } from "./env";
 import { betterAuth } from "better-auth";
 import { pool } from "./auth.js";
 
@@ -5,13 +6,8 @@ import { pool } from "./auth.js";
 export const staffAuth = betterAuth({
   database: pool,
   basePath: '/api/staff-auth',
-  baseURL: "https://djiwatentram.yumme.id",
-  trustedOrigins: [
-    "https://karyawan.yumme.id",
-    "https://rekrutmen.yumme.id",
-    "http://localhost:5173",
-    "http://localhost:5174",
-  ],
+  baseURL: serverUrl("AUTH_BASE_URL"),
+  trustedOrigins: envOrigins("STAFF_TRUSTED_ORIGINS"),
   advanced: {
     cookiePrefix: "djiwa_staff",
     defaultCookieAttributes: {

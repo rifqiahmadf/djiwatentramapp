@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
 	Trophy,
 	Crown,
@@ -31,7 +31,7 @@ type LeaderboardEntry = {
 
 // ── Animation variants ────────────────────────────────────────────────────
 
-const containerVariants = {
+const containerVariants: Variants = {
 	hidden: { opacity: 0 },
 	visible: {
 		opacity: 1,
@@ -39,7 +39,7 @@ const containerVariants = {
 	},
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
 	hidden: { opacity: 0, y: 12 },
 	visible: {
 		opacity: 1,
@@ -48,7 +48,7 @@ const itemVariants = {
 	},
 };
 
-const podiumVariants = {
+const podiumVariants: Variants = {
 	hidden: { opacity: 0, scale: 0.85, y: 20 },
 	visible: (i: number) => ({
 		opacity: 1,
@@ -63,7 +63,7 @@ const podiumVariants = {
 	}),
 };
 
-const counterVariants = {
+const counterVariants: Variants = {
 	initial: { scale: 0.5, opacity: 0 },
 	animate: (i: number) => ({
 		scale: 1,
@@ -137,7 +137,7 @@ function buildLeaderboard(
 			// Skip Manajer — leaderboard khusus staff non-manajerial
 			const role = (mb.roleName ?? "").toLowerCase();
 			if (role.includes("manajer") || role.includes("manager")) continue;
-			const existing = memberMap.get(mb.name) ?? {
+			const existing: LeaderboardEntry = memberMap.get(mb.name) ?? {
 				name: mb.name,
 				roleName: mb.roleName,
 				totalBonus: 0,
@@ -461,7 +461,7 @@ export function LeaderboardPanel() {
 					</p>
 				</div>
 				<Link
-					search={{}} search={{ selectedStartTime: undefined }} to="/admin/finance/shift-reports"
+					search={{ selectedStartTime: undefined }} to="/admin/finance/shift-reports"
 					className="flex items-center gap-1 rounded-lg bg-primary/10 px-2 py-1 text-[11px] font-bold text-primary hover:bg-primary/20 transition-all"
 				>
 					Lihat Semua

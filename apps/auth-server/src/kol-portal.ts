@@ -1,3 +1,4 @@
+import { envOrigins } from "./env";
 import type { Hono } from "hono";
 
 import { createHash } from "node:crypto";
@@ -668,7 +669,7 @@ export function registerKolPortalRoutes(app: AppLike, auth: AuthApi, pool: DbPoo
 
   app.post("/api/kol/public/:username/inquiries", async (c) => {
     const origin = c.req.header("origin");
-    if (origin && origin !== "https://kolmarketing.yumme.id" && !/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+    if (origin && !envOrigins("KOL_PUBLIC_ALLOWED_ORIGINS").includes(origin)) {
       return json(c, { success: false, error: "ORIGIN_NOT_ALLOWED" }, 403);
     }
     const declaredLength = Number(c.req.header("content-length") || 0);

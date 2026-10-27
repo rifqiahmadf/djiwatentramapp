@@ -1,9 +1,10 @@
+import os
 import httpx
 from datetime import datetime, timedelta
 import asyncio
 
-SUPABASE_URL = 'https://supabase.yumme.id'
-SUPABASE_KEY = open('/opt/supabase-selfhost/.env').read().split('ANON_KEY=',1)[1].splitlines()[0].strip()
+SUPABASE_URL = f"{os.environ['SUPABASE_URL'].rstrip('/')}"
+SUPABASE_KEY = open(f"{os.environ['SUPABASE_SELFHOST_DIR'].rstrip('/')}/.env").read().split('ANON_KEY=',1)[1].splitlines()[0].strip()
 
 headers = {
     'apikey': SUPABASE_KEY,

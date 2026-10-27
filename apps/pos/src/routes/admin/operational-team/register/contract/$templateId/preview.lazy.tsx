@@ -56,6 +56,11 @@ function ContractPreviewPage() {
 	const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 	const [sigDataUrl, setSigDataUrl] = useState<string | null>(null);
 
+	const onboardingSettings = useMemo(
+		() => normalizeEmployeeOnboardingSettings(siteSettings?.employeeOnboarding),
+		[siteSettings?.employeeOnboarding, refreshKey]
+	);
+
 	// Pre-fetch admin signature to data URL for PDF inclusion
 	useEffect(() => {
 		if (onboardingSettings.signatorySignatureUrl && !sigDataUrl) {
@@ -73,10 +78,7 @@ function ContractPreviewPage() {
 		}
 	}, [onboardingSettings.signatorySignatureUrl, sigDataUrl]);
 
-	const onboardingSettings = useMemo(
-		() => normalizeEmployeeOnboardingSettings(siteSettings?.employeeOnboarding),
-		[siteSettings?.employeeOnboarding, refreshKey]
-	);
+
 	const contractTemplatesByRoleId = onboardingSettings.contractTemplatesByRoleId || {};
 	const templateValue = contractTemplatesByRoleId[templateId];
 	const templateName = extractNameFromKey(templateId, roles);

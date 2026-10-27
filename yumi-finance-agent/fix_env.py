@@ -20,10 +20,10 @@ SROLE = environ.get('SUPABASE_SERVICE_ROLE_KEY', '')
 
 # Ambil key dari runtime env, bukan hardcode palsu
 SUMOPOD_KEY = environ.get('SUMOPOD_API_KEY', '')
-SUMOPOD_URL = environ.get('SUMOPOD_BASE_URL', 'http://127.0.0.1:20128/v1')
+SUMOPOD_URL = (environ.get('SUMOPOD_BASE_URL') or environ['NINEROUTER_BASE_URL']).rstrip('/')
 SUMOPOD_VISION = environ.get('SUMOPOD_VISION_MODEL', 'ag/gemini-3-flash')
 SUMOPOD_TEXT = environ.get('SUMOPOD_TEXT_MODEL', 'ag/gemini-3-flash')
-NINEROUTER_URL = environ.get('NINEROUTER_BASE_URL', 'http://127.0.0.1:20128/v1')
+NINEROUTER_URL = environ['NINEROUTER_BASE_URL'].rstrip('/')
 NINEROUTER_VISION = environ.get('NINEROUTER_VISION_MODEL', 'ag/gemini-3-flash')
 NINEROUTER_TEXT = environ.get('NINEROUTER_TEXT_MODEL', 'ds/deepseek-v4-flash')
 
@@ -46,7 +46,7 @@ NINEROUTER_VISION_MODEL={NINEROUTER_VISION}
 NINEROUTER_TEXT_MODEL={NINEROUTER_TEXT}
 """
 
-with open('/opt/djiwatentramapp/yumi-finance-agent/.env', 'w') as f:
+with open(f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-finance-agent/.env", 'w') as f:
     f.write(env_content)
 
 print("✅ .env written successfully (all keys from runtime)")

@@ -9,7 +9,7 @@ import os
 from datetime import datetime, timedelta, timezone
 
 # ponytail: baca .env manual, hindari dependency
-ENV = "/opt/djiwatentramapp/yumi-finance-agent/.env"
+ENV = f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-finance-agent/.env"
 cfg = {}
 for line in open(ENV):
     line = line.strip()

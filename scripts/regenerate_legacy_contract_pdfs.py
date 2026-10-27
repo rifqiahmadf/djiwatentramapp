@@ -20,9 +20,9 @@ import requests
 from fpdf import FPDF
 from PIL import Image
 
-ROOT = Path('/opt/djiwatentramapp')
+ROOT = Path(f"{os.environ['APP_ROOT'].rstrip('/')}")
 ENV_FILE = ROOT / 'apps/pos/.env'
-STORAGE_ROOT = Path('/opt/supabase-selfhost/volumes/storage')
+STORAGE_ROOT = Path(f"{os.environ['SUPABASE_SELFHOST_DIR'].rstrip('/')}/volumes/storage")
 FONT = '/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf'
 FONT_BOLD = '/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf'
 
@@ -327,8 +327,8 @@ def main():
         backup.append({'id': str(app_id), 'name': name, 'old_url': old_url, 'new_url': new_url})
         targets.append((name, len(text), new_url))
 
-    Path('/opt/djiwatentramapp/.contract-pdf-regeneration-backup.json').write_text(json.dumps(backup, indent=2))
-    print(json.dumps({'regenerated': len(targets), 'targets': targets, 'backup': '/opt/djiwatentramapp/.contract-pdf-regeneration-backup.json'}, indent=2))
+    Path(f"{os.environ['APP_ROOT'].rstrip('/')}/.contract-pdf-regeneration-backup.json").write_text(json.dumps(backup, indent=2))
+    print(json.dumps({'regenerated': len(targets), 'targets': targets, 'backup': f"{os.environ['APP_ROOT'].rstrip('/')}/.contract-pdf-regeneration-backup.json"}, indent=2))
 
 
 if __name__ == '__main__':

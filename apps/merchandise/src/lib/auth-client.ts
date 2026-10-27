@@ -1,15 +1,16 @@
+import { publicUrl, publicOrigins } from "../../../../packages/env/src/endpoints";
 import { createAuthClient } from "better-auth/react";
 import { sentinelClient } from "@better-auth/infra/client";
 
-const AUTH_SERVER_URL = "https://api.yumme.id/v1/auth";
-const DJIWA_APP_LOGIN_URL = "https://djiwatentram.yumme.id/masuk";
-const MERCHANDISE_ORIGIN = "https://merchandise.yumme.id";
+const AUTH_SERVER_URL = publicUrl("VITE_API_ORIGIN", "/v1/auth");
+const DJIWA_APP_LOGIN_URL = publicUrl("VITE_CUSTOMER_ORIGIN", "/masuk");
+const MERCHANDISE_ORIGIN = publicUrl("VITE_MERCHANDISE_ORIGIN");
 const ALLOWED_ORDER_STEPS = new Set(["checkout", "shipping", "payment"]);
 
 function isSafeMerchandiseReturnUrl(value: string) {
   try {
     const url = new URL(value);
-    if (url.origin !== MERCHANDISE_ORIGIN && url.origin !== "http://localhost:5174") return false;
+    if (url.origin !== MERCHANDISE_ORIGIN && !publicOrigins("VITE_ADDITIONAL_RETURN_ORIGINS").includes(url.origin)) return false;
     if (!/^\/[^/]+\/order$/.test(url.pathname)) return false;
     const step = url.searchParams.get("step");
     return [...url.searchParams.keys()].every((key) => key === "step") && !url.hash && (step == null || ALLOWED_ORDER_STEPS.has(step));

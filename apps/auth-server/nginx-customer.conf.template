@@ -1,6 +1,6 @@
 server {
-    server_name djiwatentram.yumme.id;
-    root /var/www/djiwatentram.yumme.id;
+    server_name ${CUSTOMER_DOMAIN};
+    root ${CUSTOMER_WEBROOT};
     index index.html;
 
     client_max_body_size 10m;
@@ -8,10 +8,10 @@ server {
     # Customer Stories: same-origin proxy so the .yumme.id session cookie reaches the Worker.
     location ^~ /api/customer-stories/ {
         rewrite ^/api/customer-stories/(.*)$ /$1 break;
-        proxy_pass https://djiwa-customer-stories.zantaratechnology.workers.dev;
+        proxy_pass ${CUSTOMER_STORIES_ORIGIN};
         proxy_ssl_server_name on;
-        proxy_ssl_name djiwa-customer-stories.zantaratechnology.workers.dev;
-        proxy_set_header Host djiwa-customer-stories.zantaratechnology.workers.dev;
+        proxy_ssl_name ${CUSTOMER_STORIES_HOST};
+        proxy_set_header Host ${CUSTOMER_STORIES_HOST};
         proxy_set_header Cookie $http_cookie;
         proxy_set_header Origin $http_origin;
         proxy_set_header X-Real-IP $remote_addr;
@@ -23,7 +23,7 @@ server {
     }
 
     location /api/auth/ {
-        proxy_pass http://localhost:3001/api/auth/;
+        proxy_pass ${AUTH_INTERNAL_ORIGIN}/api/auth/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -35,7 +35,7 @@ server {
     }
 
     location /api/kol/ {
-        proxy_pass http://localhost:3001/api/kol/;
+        proxy_pass ${AUTH_INTERNAL_ORIGIN}/api/kol/;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -45,7 +45,7 @@ server {
     }
 
     location /api/customer/ {
-        proxy_pass http://localhost:3001/api/customer/;
+        proxy_pass ${AUTH_INTERNAL_ORIGIN}/api/customer/;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -83,19 +83,19 @@ server {
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/djiwatentram.yumme.id/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/djiwatentram.yumme.id/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/${CUSTOMER_DOMAIN}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/${CUSTOMER_DOMAIN}/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 server {
-    if ($host = djiwatentram.yumme.id) {
+    if ($host = ${CUSTOMER_DOMAIN}) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
-    server_name djiwatentram.yumme.id;
+    server_name ${CUSTOMER_DOMAIN};
 
     listen 80;
     return 404; # managed by Certbot

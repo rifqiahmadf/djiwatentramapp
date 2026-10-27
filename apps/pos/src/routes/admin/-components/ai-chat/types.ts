@@ -1,26 +1,7 @@
 import type { ScanEditParams } from "@/components/scan/scan-edit-modal";
 
-export interface ScanResultData {
-	type: string;
-	name: string; // Merchant Name
-	category: string;
-	merchant?: string; // Optional alias for name
-	transactionType: "expense" | "income" | "unknown";
-	total: number;
-	subtotal?: number;
-	tax?: number;
-	serviceCharge?: number;
-	discount?: number;
-	items: Array<{ name: string; qty: number; price: number; subtotal: number; unit?: string }>;
-	date?: string | null;
-	time?: string;
-	receiptNumber?: string;
-	paymentMethod: string;
-	notes?: string;
-	confidence: number;
-	rawText?: string;
-	rewrittenText?: string;
-}
+import type { ScanResultData } from "@yumipos/web-shared/lib/scan-result";
+export type { ScanResultData };
 
 export interface QuickActionButton {
 	id: string;

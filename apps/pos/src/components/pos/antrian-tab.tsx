@@ -257,7 +257,7 @@ export function CompletedDetailModal({
 						console.error("[antrian] Failed to fetch order items:", error);
 						setItems([]);
 					} else {
-						setItems(Array.isArray(data?.items) ? data.items : []);
+						setItems(data && Array.isArray(data.items) ? data.items : []);
 					}
 					setItemsLoading(false);
 				}
@@ -846,7 +846,7 @@ export function AntrianTab({ onClose }: { onClose?: () => void }) {
 										) : (
 											<ChefHat className="h-3 w-3 shrink-0 text-orange-500/60" />
 										)}
-										<span className="font-mono text-[10px] font-medium truncate">{getDisplayOrderNumber(o.order_no, { createdAt: Date.parse(o.created_at) })}</span>
+										<span className="font-mono text-[10px] font-medium truncate">{getDisplayOrderNumber(o.order_no, { createdAt: o.created_at ? Date.parse(o.created_at) : undefined })}</span>
 										<span className="text-[11px] text-muted-foreground/60">• {o.selesai_by || "?"}</span>
 									</div>
 									<div className="flex items-center gap-1.5">

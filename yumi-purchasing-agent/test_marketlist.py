@@ -12,7 +12,7 @@ import json
 import os
 import sys
 import tempfile
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -398,7 +398,9 @@ async def main():
     for name, fn in tests:
         print(f"📋 {name}")
         try:
-            await fn()
+            # These tests exercise deterministic rule fallbacks, without HTTP calls.
+            with patch("marketlist._ai_chat", AsyncMock(return_value="No AI result")):
+                await fn()
         except Exception as e:
             global failed
             failed += 1

@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 const configuredStorageBaseUrl = (
   import.meta.env.VITE_SUPABASE_STORAGE_PUBLIC_URL as string | undefined
 )?.trim().replace(/\/+$/, "");
@@ -7,7 +8,7 @@ const legacyStorageOrigins = new Set([
   "https://supabase.yumme.id",
 ]);
 
-const selfHostedStorageOrigin = "https://supabase.djiwatentram.web.id";
+const selfHostedStorageOrigin = publicUrl("VITE_SUPABASE_URL");
 
 export function resolveCustomerAssetUrl(value?: unknown): string | undefined {
   if (typeof value !== "string") return undefined;

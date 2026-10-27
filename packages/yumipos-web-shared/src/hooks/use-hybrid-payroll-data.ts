@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../env/src/endpoints";
 import { createClient } from "../lib/client";
 import { useSupabaseLiveValue } from "./use-supabase-live-value";
 import { invokeEdgeFunction } from "../lib/api-helper";
@@ -16,7 +17,7 @@ function useSupabaseValue<T>(
 }
 
 // ─── Constants ──────────────────────────────────────
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? "https://supabase.yumme.id";
+const SUPABASE_URL = publicUrl("VITE_SUPABASE_URL");
 
 // ─── Edge Function Helper ────────────────────────────
 // Replaces the broken executeSql() which used Node.js fs/promises in the browser.

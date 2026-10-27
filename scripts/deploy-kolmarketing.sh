@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
-DOMAIN="kolmarketing.yumme.id"
+DOMAIN="${KOL_DOMAIN:?Set KOL_DOMAIN}"
 WEBROOT="/var/www/$DOMAIN"
 SITE="/etc/nginx/sites-available/kolmarketing"
 ENABLED="/etc/nginx/sites-enabled/kolmarketing"

@@ -1,3 +1,4 @@
+import { publicOrigins } from "../../../../packages/env/src/endpoints";
 import { useEffect, useState } from "react";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
@@ -26,13 +27,7 @@ function getSafeCustomerReturnUrl() {
   if (!raw) return null;
   try {
     const url = new URL(raw);
-    const allowedOrigins = new Set([
-      "https://merchandise.yumme.id",
-      "https://ordermieyamin.yumme.id",
-      "https://booking.yumme.id",
-      "http://localhost:3010",
-      "http://localhost:5174",
-    ]);
+    const allowedOrigins = new Set(publicOrigins("VITE_CUSTOMER_RETURN_ORIGINS"));
     const isAllowedPath = /^\/[^/]+\/order$/.test(url.pathname) || url.pathname === "/";
     const step = url.searchParams.get("step");
     const stage = url.searchParams.get("stage");

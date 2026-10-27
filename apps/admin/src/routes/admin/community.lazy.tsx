@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../../packages/env/src/endpoints";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, Loader2, ShieldAlert, Trash2, EyeOff } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -6,7 +7,7 @@ import { isAdminLevelRole } from "@/lib/admin-access";
 import { Button } from "@/components/ui/button";
 
 type Report = { id: string; post_id: string; reporter_source_id: string; reason: string; status: string; created_at: string; post?: { body: string | null; media_type: "image" | "video" | null; author_source_id: string; created_at: string } | null };
-const API_BASE = (import.meta.env.VITE_CUSTOMER_COMMUNITY_API_URL?.trim() || "https://djiwa-customer-community.zantaratechnology.workers.dev").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_CUSTOMER_COMMUNITY_API_URL?.trim() || publicUrl("VITE_CUSTOMER_COMMUNITY_API_URL")).replace(/\/$/, "");
 
 export const Route = createLazyFileRoute("/admin/community")({ component: CommunityModerationPage });
 

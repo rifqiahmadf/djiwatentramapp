@@ -1,3 +1,4 @@
+import { createVendorChunks } from "../../packages/config/vendor-chunks";
 import path from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -8,7 +9,7 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
-  build: {
+  build: { rollupOptions: { output: { manualChunks: createVendorChunks(), onlyExplicitManualChunks: true } },
     target: "es2020",
   },
   server: { port: 3004 },

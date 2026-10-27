@@ -1,3 +1,4 @@
+import { requiredEnv } from "../_shared/env.ts";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import bcrypt from "npm:bcryptjs@2.4.3";
 
@@ -24,7 +25,7 @@ const supabaseUrl = Deno.env.get("YUMI_SUPABASE_URL") ?? Deno.env.get("SUPABASE_
  * ke domain API yang dipakai semua app (lihat VITE_SUPABASE_URL di apps/*).
  */
 const publicSupabaseUrl = (
-	Deno.env.get("YUMI_PUBLIC_SUPABASE_URL") ?? "https://supabase.yumme.id"
+	requiredEnv("YUMI_PUBLIC_SUPABASE_URL")
 ).replace(/\/+$/, "");
 const supabaseServiceRoleKey = Deno.env.get("YUMI_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -136,7 +137,7 @@ async function restDelete(table: string, eqColumn: string, eqValue: string) {
 }
 
 // GoTrue Admin API — POST to http://auth:8081/admin/<path>
-const gotrueUrl = Deno.env.get("SUPABASE_URL")?.replace("kong:8000", "auth:8081") ?? "http://auth:8081";
+const gotrueUrl = requiredEnv("GOTRUE_INTERNAL_URL");
 
 /** Endpoint GoTrue non-admin (mis. /verify). */
 async function gotruePublic(path: string, body: Record<string, unknown>) {

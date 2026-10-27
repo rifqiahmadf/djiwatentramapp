@@ -1,3 +1,4 @@
+import { requiredEnv } from "../_shared/env.ts";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 type Json = Record<string, unknown>;
@@ -136,7 +137,7 @@ async function pushStatus(user: UserContext, endpoint: unknown) {
 async function dispatchWebPush(notification: any) {
   const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY") ?? "";
   const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY") ?? "";
-  const vapidSubject = Deno.env.get("VAPID_SUBJECT") ?? "mailto:admin@yumme.id";
+  const vapidSubject = requiredEnv("VAPID_SUBJECT");
   if (!vapidPublicKey || !vapidPrivateKey || !notification?.id) return;
   const subscriptions = await dbGet("pos_notification_push_subscriptions", { select: "id,endpoint,p256dh,auth,user_id,customer_id,app_scope,target_role,target_branch_id", is_active: "eq.true", limit: "500" });
   const targets = (subscriptions ?? []).filter((item: any) => {

@@ -124,7 +124,7 @@ async def main() -> int:
         return 0
 
     model = os.getenv("NINEROUTER_VISION_MODEL") or os.getenv("NINEROUTER_TEXT_MODEL", "ag/gemini-3-flash")
-    client = SumoPodClient(os.getenv("SUMOPOD_API_KEY", ""), base_url=os.getenv("NINEROUTER_BASE_URL", "http://127.0.0.1:20128/v1"))
+    client = SumoPodClient(os.getenv("SUMOPOD_API_KEY", ""), base_url=os.environ["NINEROUTER_BASE_URL"].rstrip("/"))
     async with httpx.AsyncClient(timeout=30) as http:
         for index, (row, fields, image_url) in enumerate(candidates, 1):
             receipt_id = stable_id("receipt", str(row["source_id"]))

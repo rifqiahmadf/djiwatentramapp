@@ -1,14 +1,8 @@
+import { publicUrl, publicOrigins } from "../../env/src/endpoints";
 import type { DjiwaPayContext, ReturnTarget } from "./types";
 
-export const PAY_ORIGIN = "https://pay.djiwatentram.web.id";
-export const ALLOWED_RETURN_ORIGINS = new Set([
-  "https://djiwatentram.yumme.id",
-  "https://djiwatentram.web.id",
-  "https://b2b.djiwatentram.web.id",
-  "https://merchandise.djiwatentram.web.id",
-  "https://pos.djiwatentram.web.id",
-  "https://admin.djiwatentram.web.id",
-]);
+export const PAY_ORIGIN = publicUrl("VITE_PAY_ORIGIN");
+export const ALLOWED_RETURN_ORIGINS = new Set(publicOrigins("VITE_PAY_RETURN_ORIGINS"));
 
 export function normalizeReturnTarget(value: string | undefined): ReturnTarget | null {
   if (!value) return null;

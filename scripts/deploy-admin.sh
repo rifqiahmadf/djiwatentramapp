@@ -10,8 +10,8 @@ set -eo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$SCRIPT_DIR"
 
-ADMIN_DOMAIN="admindjiwatentram.yumme.id"
-POS_DOMAIN="pos.yumme.id"
+ : "${ADMIN_DOMAIN:?Set ADMIN_DOMAIN}"
+ : "${POS_DOMAIN:?Set POS_DOMAIN}"
 DEBUG="${DEBUG:-0}"
 
 echo "🚀 Deploying Admin subdomain -> https://$ADMIN_DOMAIN"
@@ -66,7 +66,7 @@ echo "🔍 Verifying..."
 ADMIN_LOGIN=$(curl -s -o /dev/null -w '%{http_code}' "https://$ADMIN_DOMAIN/admin/login")
 ADMIN_CUSTOMERS=$(curl -s -o /dev/null -w '%{http_code}' "https://$ADMIN_DOMAIN/admin/customers")
 POS_REGRESSION=$(curl -s -o /dev/null -w '%{http_code}' "https://$POS_DOMAIN/admin")
-SUPABASE_API=$(curl -s -o /dev/null -w '%{http_code}' "https://supabase.yumme.id/rest/v1/")
+SUPABASE_API=$(curl -s -o /dev/null -w '%{http_code}' "${SUPABASE_URL:?Set SUPABASE_URL}/rest/v1/")
 
 echo "  admin/login        -> $ADMIN_LOGIN"
 echo "  admin/customers    -> $ADMIN_CUSTOMERS"

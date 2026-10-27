@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../packages/env/src/endpoints";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, BadgeCheck, ChevronRight, Globe2, HeartHandshake, MapPin, ShoppingBag, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -5,28 +6,28 @@ import { OwnerFooter } from "@yumipos/web-shared";
 
 const links = [
   {
-    href: "https://djiwatentram.yumme.id",
+    href: publicUrl("VITE_CUSTOMER_ORIGIN"),
     label: "Djiwa Tentram App",
     description: "Pesan menu favorit dengan mudah",
     icon: Globe2,
     tone: "bg-[#eaf2ff] text-[#1a5dc6]",
   },
   {
-    href: "https://booking.yumme.id",
+    href: publicUrl("VITE_BOOKING_ORIGIN"),
     label: "Booking Djiwa Tentram",
     description: "Rencanakan momen spesialmu",
     icon: MapPin,
     tone: "bg-[#eef7f4] text-[#19745d]",
   },
   {
-    href: "https://rekrutmen.yumme.id",
+    href: publicUrl("VITE_REKRUTMEN_ORIGIN"),
     label: "Karier bersama kami",
     description: "Temukan kesempatan untuk bertumbuh",
     icon: HeartHandshake,
     tone: "bg-[#fff4e8] text-[#b56715]",
   },
   {
-    href: "https://ordermieyamin.yumme.id",
+    href: publicUrl("VITE_ORDERMIEYAMIN_ORIGIN"),
     label: "Order Mie Yamin Mentah",
     description: "Mulai 1 kg untuk reseller, warung, dan katering",
     icon: ShoppingBag,

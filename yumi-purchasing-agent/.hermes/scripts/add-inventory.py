@@ -7,8 +7,8 @@ import asyncio
 import uuid
 
 # Add the project to path
-sys.path.insert(0, "/opt/djiwatentramapp/yumi-purchasing-agent")
-os.chdir("/opt/djiwatentramapp/yumi-purchasing-agent")
+sys.path.insert(0, f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-purchasing-agent")
+os.chdir(f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-purchasing-agent")
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -106,7 +106,7 @@ async def main():
     
     # Save alias entries to learning_memory
     print("\n=== Adding alias entries ===")
-    LM_FILE = "/opt/djiwatentramapp/yumi-purchasing-agent/learning_memory.json"
+    LM_FILE = f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-purchasing-agent/learning_memory.json"
     with open(LM_FILE) as f:
         lm_data = json.load(f)
     

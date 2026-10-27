@@ -5,10 +5,11 @@ Query financial_transactions hari ini (pos) + accounting_entries (public),
 hitung debit/kredit, income/expense, dan kirim laporan ke grup -4995568785.
 Run: .venv/bin/python daily_accounting_report.py
 """
+import os
 import httpx
 from datetime import datetime, timedelta, timezone
 
-ENV = "/opt/djiwatentramapp/yumi-finance-agent/.env"
+ENV = f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-finance-agent/.env"
 cfg = {}
 for line in open(ENV):
     line = line.strip()

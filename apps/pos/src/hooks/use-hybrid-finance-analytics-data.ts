@@ -418,11 +418,12 @@ export function useHybridAllTransactions(args?: {
 	type?: "income" | "expense";
 	startDate?: number;
 	endDate?: number;
+	refreshTrigger?: number;
 }) {
 	return useSupabaseValue(
-		`all-transactions:${args?.type ?? "all"}:${args?.startDate ?? ""}:${args?.endDate ?? ""}`,
+		`all-transactions:${args?.type ?? "all"}:${args?.startDate ?? ""}:${args?.endDate ?? ""}:${args?.refreshTrigger ?? 0}`,
 		() => fetchFinancialTransactions(args),
-		[args?.type, args?.startDate, args?.endDate]
+		[args?.type, args?.startDate, args?.endDate, args?.refreshTrigger]
 	) as any;
 }
 

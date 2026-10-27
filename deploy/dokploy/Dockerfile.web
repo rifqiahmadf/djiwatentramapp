@@ -1,0 +1,38 @@
+# syntax=docker/dockerfile:1
+FROM node:24-bookworm-slim AS manifests
+WORKDIR /source
+COPY . .
+RUN node scripts/collect-workspace-manifests.mjs /source /manifests
+
+FROM node:24-bookworm-slim AS build
+WORKDIR /app
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install --global bun@1.3.4 --no-audit --no-fund
+COPY --from=manifests /manifests/ ./
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    bun install --frozen-lockfile
+COPY . .
+ARG APP_NAME=customer
+ARG DEPLOYMENT_DOMAIN
+ARG VITE_SUPABASE_URL
+ARG VITE_ANALYZER_URL
+ARG VITE_REPORT_SERVICE_URL
+ARG VITE_AI_PARSER_URL
+ARG VITE_CUSTOMER_COMMUNITY_API_URL
+RUN --mount=type=secret,id=supabase_publishable,required=true \
+    case "$APP_NAME" in customer|admin|pos|booking|karyawan|b2b|merchandise|ordermieyamin|500kopitasik|djiwapay|investor|kol|linkbio|yumme) ;; *) echo 'Unsupported APP_NAME' >&2; exit 1;; esac; \
+    node scripts/prepare-deployment-env.mjs "apps/$APP_NAME/.env.production.local" /run/secrets/supabase_publishable && \
+    cd "apps/$APP_NAME" && \
+    node ../../scripts/check-build-env.mjs && \
+    ./node_modules/.bin/vite build --outDir /out --emptyOutDir && \
+    node ../../scripts/check-build-env.mjs --dist /out
+
+FROM nginx:1.28-alpine
+ENV NGINX_ENVSUBST_FILTER=API_UPSTREAM
+ENV API_UPSTREAM=http://api:3001
+COPY deploy/dokploy/web.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=build /out /usr/share/nginx/html
+EXPOSE 80
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD wget -Y off -q -O /dev/null http://127.0.0.1/healthz || exit 1

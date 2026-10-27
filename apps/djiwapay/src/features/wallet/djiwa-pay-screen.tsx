@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../../packages/env/src/endpoints";
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Bell, Car, CreditCard, Droplets, Eye, EyeOff, Gamepad2, HeartPulse, HelpCircle, House, ReceiptText, RefreshCw, ScanLine, Smartphone, Tv, UserRound, Wallet, Wifi, X, Zap } from "lucide-react";
@@ -188,7 +189,7 @@ export function DjiwaPayScreen({ profile, wallet, loading, error, busy, onRefres
   const outgoing = wallet?.wallet.total_debited ?? entries.filter((entry) => entry.direction === "debit").reduce((total, entry) => total + entry.amount, 0);
   const userId = visible ? profile.source_id : `••••••••${profile.source_id.slice(-4)}`;
   const status = wallet?.wallet.status === "blocked" ? "DIBLOKIR" : "AKTIF";
-  const customerHome = navigationContext?.source === "customer" ? `https://djiwatentram.web.id/${encodeURIComponent(navigationContext.username)}` : "https://djiwatentram.web.id/";
+  const customerHome = navigationContext?.source === "customer" ? `${publicUrl("VITE_CUSTOMER_ORIGIN")}/${encodeURIComponent(navigationContext.username)}` : publicUrl("VITE_CUSTOMER_ORIGIN", "/");
   const customerOrder = navigationContext?.source === "customer" ? `${customerHome}/order?step=table` : customerHome;
   const customerCommunity = navigationContext?.source === "customer" ? `${customerHome}/komunitas` : customerHome;
   const customerProfile = navigationContext?.source === "customer" ? `${customerHome}/profile` : customerHome;

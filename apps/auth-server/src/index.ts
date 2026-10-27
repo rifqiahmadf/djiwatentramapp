@@ -1,3 +1,5 @@
+import { registerLegacyApiAlias } from "./legacy-api-alias";
+import { serverUrl, envOrigins } from "./env";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { serve } from "@hono/node-server";
@@ -11,33 +13,12 @@ import { join } from "node:path";
 import { createHmac } from "node:crypto";
 
 const app = new Hono();
-const MAYAR_PROXY_URL = process.env.MAYAR_PROXY_URL || "https://supabase.djiwatentram.web.id/functions/v1/mayar-proxy";
+registerLegacyApiAlias(app);
+const MAYAR_PROXY_URL = process.env.MAYAR_PROXY_URL || serverUrl("SUPABASE_URL", "/functions/v1/mayar-proxy");
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 const MAYAR_DEFAULT_MOBILE = process.env.MAYAR_DEFAULT_MOBILE || "";
-const IAK_PPOB_URL = process.env.IAK_PPOB_URL || "https://api.djiwatentram.web.id/api/ppob/iak/";
-const customerOrigins = [
-  "https://djiwatentram.yumme.id",
-  "https://djiwatentram.web.id",
-  "https://pay.djiwatentram.web.id",
-  "https://investor.yumme.id",
-  "https://investor.djiwatentram.web.id",
-  "https://merchandise.yumme.id",
-  "https://merchandise.djiwatentram.web.id",
-  "https://booking.yumme.id",
-  "https://booking.djiwatentram.web.id",
-  "https://b2b.yumme.id",
-  "https://b2b.djiwatentram.web.id",
-  "https://ordermieyamin.yumme.id",
-  "https://ordermieyamin.djiwatentram.web.id",
-  "https://500kopitasik.yumme.id",
-  "https://kopitasik.djiwatentram.web.id",
-  "https://kolmarketing.yumme.id",
-  "https://kol.djiwatentram.web.id",
-  "https://rekrutmen.yumme.id",
-  "https://rekrutmen.djiwatentram.web.id",
-  "http://localhost:5173",
-  "http://localhost:3010",
-];
+const IAK_PPOB_URL = process.env.IAK_PPOB_URL || serverUrl("API_ORIGIN", "/api/ppob/iak/");
+const customerOrigins = envOrigins("CUSTOMER_ALLOWED_ORIGINS");
 const stickerRateLimit = new Map<string, number[]>();
 
 function allowStickerRequest(key: string) {
@@ -78,7 +59,7 @@ app.use(
 app.use(
   "/api/coffee-passport/*",
   cors({
-    origin: ["https://kopitasik.djiwatentram.web.id", "http://localhost:3010"],
+    origin: envOrigins("COFFEE_ALLOWED_ORIGINS"),
     allowHeaders: ["Accept", "Content-Type", "X-Request-Id"],
     allowMethods: ["GET", "POST", "OPTIONS"],
     credentials: true,
@@ -115,7 +96,7 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 app.use(
   "/api/investor-auth/*",
   cors({
-    origin: ["https://investor.djiwatentram.web.id", "http://localhost:5173", "http://localhost:5174", "http://localhost:3011"],
+    origin: envOrigins("INVESTOR_ALLOWED_ORIGINS"),
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS"],
     credentials: true,
@@ -124,7 +105,7 @@ app.use(
 app.use(
   "/api/investor/*",
   cors({
-    origin: ["https://investor.djiwatentram.web.id", "http://localhost:5173", "http://localhost:5174", "http://localhost:3011"],
+    origin: envOrigins("INVESTOR_ALLOWED_ORIGINS"),
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS"],
     credentials: true,
@@ -136,7 +117,7 @@ registerInvestorPortalRoutes(app, investorAuth, pool);
 app.use(
   "/api/kol/*",
   cors({
-    origin: ["https://kol.djiwatentram.web.id", "http://localhost:3010"],
+    origin: envOrigins("KOL_ALLOWED_ORIGINS"),
     allowHeaders: ["Accept", "Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
@@ -198,12 +179,7 @@ registerKolPortalRoutes(app, auth, pool);
 
 // ── Better Auth KARYAWAN (staff) ──────────────────────────────────
 const RECRUITMENT_BRIDGE_SECRET = process.env.REKRUTMEN_AUTH_BRIDGE_SECRET || "";
-const staffOrigins = [
-  "https://karyawan.djiwatentram.web.id",
-  "https://rekrutmen.djiwatentram.web.id",
-  "http://localhost:5173",
-  "http://localhost:5174",
-];
+const staffOrigins = envOrigins("STAFF_ALLOWED_ORIGINS");
 
 app.use(
   "/api/staff-auth/*",
@@ -657,7 +633,7 @@ async function createListingInvoice(listingPaymentId: string, shopName: string, 
       action: "create-invoice",
       name: customer.name || "Pemilik coffee shop",
       email: customer.email,
-      redirectUrl: `https://kopitasik.djiwatentram.web.id/?listing_payment=${encodeURIComponent(listingPaymentId)}`,
+      redirectUrl: `${serverUrl("KOPITASIK_ORIGIN")}/?listing_payment=${encodeURIComponent(listingPaymentId)}`,
       description: `Listing Coffee Shop 500 Kopi Tasik - ${shopName}`,
       mobile: customer.phone || MAYAR_DEFAULT_MOBILE,
       items: [{ quantity: 1, rate: 1000, description: `Listing Coffee Shop - ${shopName}` }],
@@ -683,7 +659,7 @@ async function createBidInvoice(entryId: string, shopName: string, amount: numbe
       name: customer.name || "Pemilik kedai",
       email: customer.email,
       mobile: MAYAR_DEFAULT_MOBILE,
-      redirectUrl: "https://kopitasik.djiwatentram.web.id",
+      redirectUrl: serverUrl("KOPITASIK_ORIGIN"),
       description: `Bid Rank ${shopName}`,
       items: [{ quantity: 1, rate: amount, description: `Bid Rank ${shopName}` }],
       extraData: { coffeePassportBidEntryId: entryId, shopName },
@@ -716,7 +692,7 @@ function privateJson(body: Record<string, unknown>, status = 200) {
 
 const payBridgeTickets = new Map<string, { userId: string; expiresAt: number }>();
 const payBridgeSessions = new Map<string, { userId: string; expiresAt: number }>();
-const PAY_BRIDGE_ORIGIN = "https://pay.djiwatentram.web.id";
+const PAY_BRIDGE_ORIGIN = serverUrl("PAY_ORIGIN");
 const PAY_BRIDGE_TTL_MS = 90_000;
 const PAY_SESSION_TTL_SECONDS = 900;
 
@@ -910,7 +886,7 @@ app.post("/api/pay-bridge/ppob/invoice", async (c) => {
   const sourceId = String(session.customer.source_id || "");
   const email = String(session.customer.email || "");
   if (!sourceId || !email || !productCode || !/^[0-9]{8,20}$/.test(customerNumber)) return privateJson({ success: false, error: "INVALID_INPUT" }, 400);
-  const iakUrl = "https://api.djiwatentram.web.id/api/ppob/iak/";
+  const iakUrl = IAK_PPOB_URL;
   const catalogResponse = await fetch(iakUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "price-list" }) });
   const catalogPayload = await catalogResponse.json().catch(() => ({})) as any;
   const products = catalogPayload?.data?.data?.pricelist;
@@ -971,7 +947,7 @@ app.post("/api/pay-bridge/ppob/status", async (c) => {
   if (claim.rowCount === 0) return privateJson({ success: true, status: "pending", refId: record.ref_id, productCode: record.product_code, amount: Number(record.price), message: "Pembayaran sudah diteruskan ke provider." });
   let iakResponse: Response;
   try {
-    iakResponse = await fetch("https://api.djiwatentram.web.id/api/ppob/iak/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "top-up", ref_id: record.ref_id, customer_id: record.customer_id, product_code: record.product_code }) });
+    iakResponse = await fetch(IAK_PPOB_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "top-up", ref_id: record.ref_id, customer_id: record.customer_id, product_code: record.product_code }) });
   } catch {
     await pool.query("UPDATE pos.ppob_transactions SET payload = payload || $1::jsonb, message=$2,updated_at=now() WHERE ref_id=$3", [JSON.stringify({ iak_requested: false }), "Provider PPOB belum dapat dihubungi", record.ref_id]);
     return privateJson({ success: true, status: "pending", refId: record.ref_id, productCode: record.product_code, amount: Number(record.price), message: "Provider PPOB belum dapat dihubungi. Coba periksa status lagi." });
@@ -999,7 +975,7 @@ app.post("/api/pay-bridge/ppob/purchase", async (c) => {
   const customerNumber = typeof body.customerNumber === "string" ? body.customerNumber.trim() : "";
   const sourceId = String(session.customer.source_id || ""); const email = String(session.customer.email || "");
   if (!sourceId || !email || !productCode || !/^[0-9]{8,20}$/.test(customerNumber)) return privateJson({ success: false, error: "INVALID_INPUT" }, 400);
-  const iakUrl = "https://api.djiwatentram.web.id/api/ppob/iak/";
+  const iakUrl = IAK_PPOB_URL;
   const catalogResponse = await fetch(iakUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "price-list" }) });
   const catalogPayload = await catalogResponse.json().catch(() => ({})) as any;
   const products = catalogPayload?.data?.data?.pricelist;
@@ -1521,6 +1497,6 @@ app.post("/api/customer/guest-orders", async (c) => {
   return privateJson({ success: true, orders: result.rows });
 });
 
-const PORT = parseInt(process.env.BETTER_AUTH_PORT || "3001");
+const PORT = parseInt(process.env.PORT || process.env.BETTER_AUTH_PORT || "3001");
 console.log(`⚡ Auth server running on http://localhost:${PORT}`);
 serve({ fetch: app.fetch, port: PORT });

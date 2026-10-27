@@ -1,6 +1,7 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { useEffect, useState } from "react";
 
-const AUTH_BASE = "https://api.yumme.id";
+const AUTH_BASE = publicUrl("VITE_API_ORIGIN");
 const LOGIN_URL = `${AUTH_BASE}/masuk`;
 
 type BookingCustomer = { sourceId: string; name: string; email: string; phone: string };

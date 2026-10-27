@@ -1,11 +1,12 @@
-name: Deploy to VPS
+name: Dokploy deployment ownership
 on:
   push:
     branches: [main]
-
+permissions:
+  contents: read
 jobs:
-  deploy:
+  deployment-target:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to VPS
-        run: echo "Deploy handled by VPS cron — push only triggers notifications"
+      - name: Deployment target
+        run: echo "Production deployment is managed through Dokploy after environment and schema validation."

@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../packages/env/src/endpoints";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, BadgeCheck, BriefcaseBusiness, Check, ExternalLink, MapPin, Share2, Users } from "lucide-react";
 import { PublicTimeline } from "./components/kol-public-timeline";
@@ -27,7 +28,7 @@ type InquiryForm = {
   website: string;
 };
 
-const API = "https://api.yumme.id/v1/kol";
+const API = publicUrl("VITE_API_ORIGIN", "/v1/kol");
 const emptyInquiry: InquiryForm = { businessName: "", contactName: "", contactEmail: "", contactPhone: "", preferredContact: "either", brief: "", website: "" };
 const availabilityText: Record<string, string> = {
   open: "Terbuka untuk kolaborasi",

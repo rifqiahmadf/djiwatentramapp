@@ -41,8 +41,8 @@ deploy_app() {
 
 	# Public VAPID key is safe for the browser but must be injected at build time.
 	# Keep the private key server-side; only expose VAPID_PUBLIC_KEY to Vite.
-	if [ "$name" = "admin" ] && [ -f "/opt/supabase-selfhost/.env" ]; then
-		export VITE_VAPID_PUBLIC_KEY="$(grep -E '^VAPID_PUBLIC_KEY=' /opt/supabase-selfhost/.env | cut -d= -f2- | head -n1)"
+	if [ "$name" = "admin" ] && [ -f "${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/.env" ]; then
+		export VITE_VAPID_PUBLIC_KEY="$(grep -E '^VAPID_PUBLIC_KEY=' "${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/.env" | cut -d= -f2- | head -n1)"
 	fi
 
 	if [ "$name" = "customer" ]; then
@@ -67,9 +67,11 @@ deploy_edge_function() {
 	local name=$1
 	echo ""
 	echo "⚡ Deploying Edge Function: $name..."
-	mkdir -p "/opt/supabase-selfhost/volumes/functions/$name"
-	cp "supabase/functions/$name/index.ts" "/opt/supabase-selfhost/volumes/functions/$name/index.ts"
-	cd /opt/supabase-selfhost && docker compose up --detach functions
+	mkdir -p "${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/volumes/functions/$name"
+	mkdir -p "${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/volumes/functions/_shared"
+	cp -r supabase/functions/_shared/. "${SUPABASE_SELFHOST_DIR}/volumes/functions/_shared/"
+	cp "supabase/functions/$name/index.ts" "${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/volumes/functions/$name/index.ts"
+	cd "${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}" && docker compose up --detach functions
 	cd "$SCRIPT_DIR"
 	echo "✅ Edge Function $name deployed"
 }
@@ -93,36 +95,38 @@ install_notification_sync() {
 	# Reconcile customer orders every minute so Web Push is dispatched even when
 	# the Admin PWA is closed. The service-role key is read only by the script.
 	sudo install -m 700 "scripts/sync-pos-notifications.sh" /usr/local/sbin/djiwa-sync-pos-notifications
-	printf '*/1 * * * * root /usr/local/sbin/djiwa-sync-pos-notifications\n' | sudo tee /etc/cron.d/djiwa-pos-notifications >/dev/null
+	: "${RUNTIME_ENV_FILE:?Set RUNTIME_ENV_FILE to the scheduler environment file}"
+	[[ "$RUNTIME_ENV_FILE" =~ ^/[a-zA-Z0-9_./-]+$ ]] || { echo "Invalid RUNTIME_ENV_FILE path" >&2; return 1; }
+	printf '*/1 * * * * root set -a; . "%s"; set +a; /usr/local/sbin/djiwa-sync-pos-notifications\n' "$RUNTIME_ENV_FILE" | sudo tee /etc/cron.d/djiwa-pos-notifications >/dev/null
 	sudo chmod 644 /etc/cron.d/djiwa-pos-notifications
 }
 
 # ── Main ──
 
-SELFHOST_FUNCTIONS="/opt/supabase-selfhost/volumes/functions"
+SELFHOST_FUNCTIONS="${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/volumes/functions"
 install_notification_sync
 
 case "$APP" in
 	pos)
-		deploy_app "pos" "pos.yumme.id"
+		deploy_app "pos" "${POS_DOMAIN:?Set POS_DOMAIN}"
 		;;
 	karyawan)
-		deploy_app "karyawan" "karyawan.yumme.id"
+		deploy_app "karyawan" "${KARYAWAN_DOMAIN:?Set KARYAWAN_DOMAIN}"
 		;;
 	customer)
-		deploy_app "customer" "djiwatentram.yumme.id"
+		deploy_app "customer" "${CUSTOMER_DOMAIN:?Set CUSTOMER_DOMAIN}"
 		deploy_edge_function "customer-auth"
 		deploy_edge_function "djiwa-run"
 		;;
 	admin|web)
 		# `web` dipertahankan sebagai alias legacy, tetapi sumber Admin selalu apps/admin.
-		deploy_app "admin" "admindjiwatentram.yumme.id"
+		deploy_app "admin" "${ADMIN_DOMAIN:?Set ADMIN_DOMAIN}"
 		;;
 	all|*)
-		deploy_app "pos" "pos.yumme.id"
-		deploy_app "karyawan" "karyawan.yumme.id"
-		deploy_app "customer" "djiwatentram.yumme.id"
-		deploy_app "admin" "admindjiwatentram.yumme.id"
+		deploy_app "pos" "${POS_DOMAIN:?Set POS_DOMAIN}"
+		deploy_app "karyawan" "${KARYAWAN_DOMAIN:?Set KARYAWAN_DOMAIN}"
+		deploy_app "customer" "${CUSTOMER_DOMAIN:?Set CUSTOMER_DOMAIN}"
+		deploy_app "admin" "${ADMIN_DOMAIN:?Set ADMIN_DOMAIN}"
 		deploy_edge_function "customer-auth"
 		deploy_edge_function "djiwa-run"
 		;;

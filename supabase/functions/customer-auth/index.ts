@@ -1,3 +1,4 @@
+import { requiredEnv } from "../_shared/env.ts";
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
@@ -31,7 +32,7 @@ async function login(email: string, password: string) {
 async function register(email: string, password: string, name: string) {
 	const { data, error } = await admin.auth.signUp({
 		email, password,
-		options: { data: { name }, emailRedirectTo: "https://djiwatentram.yumme.id" },
+		options: { data: { name }, emailRedirectTo: requiredEnv("CUSTOMER_ORIGIN") },
 	});
 	if (error) return respond({ error: error.message });
 	return respond({
@@ -43,7 +44,7 @@ async function register(email: string, password: string, name: string) {
 
 async function resetPassword(email: string) {
 	const { error } = await admin.auth.resetPasswordForEmail(email, {
-		redirectTo: "https://djiwatentram.yumme.id",
+		redirectTo: requiredEnv("CUSTOMER_ORIGIN"),
 	});
 	if (error) return respond({ error: error.message });
 	return respond({ success: true });

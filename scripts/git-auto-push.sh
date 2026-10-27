@@ -2,10 +2,10 @@
 # Auto-push script untuk mengirim perubahan dari VPS ke GitHub
 # Dijalankan via cron job
 
-cd /opt/djiwatentramapp || exit 1
+cd "${APP_ROOT:?Set APP_ROOT}" || exit 1
 
 # Log file
-LOG_FILE="/opt/djiwatentramapp/logs/auto-push.log"
+LOG_FILE="${APP_ROOT:?Set APP_ROOT}/logs/auto-push.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 
 echo "=== $(date) ===" >> "$LOG_FILE"

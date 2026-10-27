@@ -75,7 +75,6 @@ const KEBERSIHAN_ICONS = { cooking: CookingPot, seating: Armchair, toilet: Toile
 
 export const Route = createLazyFileRoute("/$username/absen-keluar")({
   component: ClosingPage,
-  validateSearch: searchSchema,
 });
 
 // ═══════════════════════════════════════════
@@ -84,7 +83,7 @@ export const Route = createLazyFileRoute("/$username/absen-keluar")({
 
 function ClosingPage() {
   const { staff, username } = useStaffProfile();
-  const search = useSearch({ from: Route.id as any });
+  const search = useSearch({ from: "/$username/absen-keluar" });
   const navigate = useNavigate();
 
   // Determine shift name: from URL param, or from latest check-in, or fallback
@@ -358,6 +357,7 @@ const StockOpnameSection = forwardRef<{ getItems: () => OpnameItem[] }, { role: 
               unit: (i.unit || "").trim(),
               qtyBefore: parseFloat(i.quantity || "0"),
               qtyAfter: parseFloat(i.quantity || "0"),
+              isChanged: false,
             }))
             .sort((a: OpnameItem, b: OpnameItem) => a.name.localeCompare(b.name));
 

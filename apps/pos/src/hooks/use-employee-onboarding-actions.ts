@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { useCallback } from "react";
 import { useMutation } from "@/lib/backend-bridge";
 import { createClient } from "@/lib/client";
@@ -192,7 +193,7 @@ export function useHybridSubmitEmployeeApplication() {
 						`🎯 Role: ${roleName}`,
 						`⏰ Waktu: ${now}`,
 						"",
-						`🔗 Review: https://pos.yumme.id/admin/operational-team/register/onboarding`,
+						`🔗 Review: ${publicUrl("VITE_POS_ORIGIN")}/admin/operational-team/register/onboarding`,
 						"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
 					].join("\n");
 					await fetch(supabaseUrl + "/functions/v1/send-telegram-report", {

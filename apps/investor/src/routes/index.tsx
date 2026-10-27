@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight, BarChart3, Building2, Check, ChevronRight, CircleDollarSign, Compass, Database, LockKeyhole, Network, ShieldCheck, TrendingUp } from "lucide-react";
@@ -18,7 +19,7 @@ type PublicSnapshot = {
   completeness: "partial" | "unavailable";
 };
 
-const INVESTOR_API_BASE = import.meta.env.VITE_INVESTOR_API_URL?.trim() || "https://api.yumme.id";
+const INVESTOR_API_BASE = import.meta.env.VITE_INVESTOR_API_URL?.trim() || publicUrl("VITE_API_ORIGIN");
 const dateFormatter = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
 function formatRupiah(value: number | null) {

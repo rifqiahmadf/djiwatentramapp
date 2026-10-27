@@ -1,35 +1,23 @@
+import { serverUrl, envOrigins, requiredEnv } from "./env";
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { dash } from "@better-auth/infra";
 
-export const pool = new Pool({
-  host: "localhost",
-  port: 5433,
-  user: "supabase_admin",
+export const pool = new Pool(process.env.DATABASE_URL ? {
+  connectionString: process.env.DATABASE_URL,
+} : {
+  host: requiredEnv("PGHOST"),
+  port: Number(requiredEnv("PGPORT")),
+  user: requiredEnv("PGUSER"),
   password: process.env.DB_PASSWORD,
-  database: "postgres",
+  database: requiredEnv("PGDATABASE"),
 });
 
 export const auth = betterAuth({
   database: pool,
-  baseURL: "https://djiwatentram.yumme.id",
+  baseURL: serverUrl("AUTH_BASE_URL"),
   // Customer sessions are shared by the Djiwa App storefronts.
-  trustedOrigins: [
-    "https://djiwatentram.yumme.id",
-    "https://pay.djiwatentram.web.id",
-    "https://investor.yumme.id",
-    "https://merchandise.yumme.id",
-    "https://booking.yumme.id",
-    "https://b2b.yumme.id",
-    "https://ordermieyamin.yumme.id",
-    "https://500kopitasik.yumme.id",
-    "https://djiwatravel.com",
-    "https://www.djiwatravel.com",
-    "https://kolmarketing.yumme.id",
-    "https://rekrutmen.yumme.id",
-    "http://localhost:5173",
-    "http://localhost:3010",
-  ],
+  trustedOrigins: envOrigins("AUTH_TRUSTED_ORIGINS"),
   // Share the central customer session across Djiwa App subdomains.
   advanced: {
     cookies: {
@@ -37,8 +25,8 @@ export const auth = betterAuth({
       state: { attributes: { maxAge: 600 } },
     },
     crossSubDomainCookies: {
-      enabled: true,
-      domain: ".yumme.id",
+      enabled: Boolean(process.env.AUTH_COOKIE_DOMAIN?.trim()),
+      domain: process.env.AUTH_COOKIE_DOMAIN?.trim() || undefined,
     },
     defaultCookieAttributes: {
       secure: true,

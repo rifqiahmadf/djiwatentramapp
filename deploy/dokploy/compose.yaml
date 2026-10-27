@@ -1,0 +1,52 @@
+services:
+  customer:
+    build:
+      context: ../..
+      dockerfile: deploy/dokploy/Dockerfile.web
+      args:
+        APP_NAME: customer
+        DEPLOYMENT_DOMAIN: ${DEPLOYMENT_DOMAIN:?Set DEPLOYMENT_DOMAIN}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:?Set VITE_SUPABASE_URL}
+      secrets: [supabase_publishable]
+    environment:
+      API_UPSTREAM: http://api:3001
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [default, dokploy-network]
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/dokploy/Dockerfile.api
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set PostgreSQL connection string}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set auth secret}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?Set Google OAuth client ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?Set Google OAuth client secret}
+      AUTH_BASE_URL: https://api.${DEPLOYMENT_DOMAIN}
+      AUTH_COOKIE_DOMAIN: .${DEPLOYMENT_DOMAIN}
+      AUTH_TRUSTED_ORIGINS: ${AUTH_TRUSTED_ORIGINS:?Set explicit origins}
+      CUSTOMER_ALLOWED_ORIGINS: ${CUSTOMER_ALLOWED_ORIGINS:?Set explicit origins}
+      STAFF_TRUSTED_ORIGINS: ${STAFF_ALLOWED_ORIGINS:-}
+      STAFF_ALLOWED_ORIGINS: ${STAFF_ALLOWED_ORIGINS:-}
+      COFFEE_ALLOWED_ORIGINS: ${COFFEE_ALLOWED_ORIGINS:-}
+      INVESTOR_ALLOWED_ORIGINS: ${INVESTOR_ALLOWED_ORIGINS:-}
+      KOL_ALLOWED_ORIGINS: ${KOL_ALLOWED_ORIGINS:-}
+      KOL_PUBLIC_ALLOWED_ORIGINS: ${KOL_ALLOWED_ORIGINS:-}
+      API_ORIGIN: https://api.${DEPLOYMENT_DOMAIN}
+      CUSTOMER_ORIGIN: https://app.${DEPLOYMENT_DOMAIN}
+      PAY_ORIGIN: https://pay.${DEPLOYMENT_DOMAIN}
+      KOPITASIK_ORIGIN: https://kopitasik.${DEPLOYMENT_DOMAIN}
+      SUPABASE_URL: ${VITE_SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+      NINEROUTER_IMAGE_URL: ${NINEROUTER_IMAGE_URL:-}
+    restart: unless-stopped
+    networks: [default, dokploy-network]
+networks:
+  dokploy-network:
+    external: true
+
+secrets:
+  supabase_publishable:
+    environment: VITE_SUPABASE_PUBLISHABLE_KEY

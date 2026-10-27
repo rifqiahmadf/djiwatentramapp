@@ -1,7 +1,4 @@
-"""save_pending_receipts.py — Simpan semua pending receipt dari .pending_sessions.json ke database.
-
-Jalankan: cd /opt/djiwatentramapp/yumi-finance-agent && .venv/bin/python save_pending_receipts.py
-"""
+f"save_pending_receipts.py — Simpan semua pending receipt dari .pending_sessions.json ke database.\n\nJalankan: cd {os.environ['APP_ROOT'].rstrip('/')}/yumi-finance-agent && .venv/bin/python save_pending_receipts.py\n"
 
 import asyncio
 import json

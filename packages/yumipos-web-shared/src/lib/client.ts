@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../env/src/endpoints";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let browserClient: SupabaseClient | null = null;
@@ -18,7 +19,7 @@ let browserClient: SupabaseClient | null = null;
  */
 export function createClient() {
 	if (!browserClient) {
-		const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? "https://supabase.yumme.id";
+		const supabaseUrl = publicUrl("VITE_SUPABASE_URL");
 		const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env.VITE_SUPABASE_ANON_KEY;
 		if (!supabaseKey) throw new Error("Supabase client key is not configured.");
 		browserClient = createSupabaseClient(

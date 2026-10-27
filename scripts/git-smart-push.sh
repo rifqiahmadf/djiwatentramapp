@@ -2,10 +2,10 @@
 # Smart auto-push: hanya push perubahan yang sudah di-commit manual
 # Hindari push perubahan yang belum di-review
 
-cd /opt/djiwatentramapp || exit 1
+cd "${APP_ROOT:?Set APP_ROOT}" || exit 1
 
 # Log file
-LOG_FILE="/opt/djiwatentramapp/logs/smart-auto-push.log"
+LOG_FILE="${APP_ROOT:?Set APP_ROOT}/logs/smart-auto-push.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 
 echo "=== $(date) ===" >> "$LOG_FILE"

@@ -121,7 +121,7 @@ export function ExpensesTable() {
 	useEffect(() => {
 		let cancelled = false;
 		const supabase = createClient();
-		supabase.from("pos_expense_inventory_reconciliation").select("_id,rawName,reconciliationStatus,transactionId").limit(1000).then(({ data }) => {
+		Promise.resolve(supabase.from("pos_expense_inventory_reconciliation").select("_id,rawName,reconciliationStatus,transactionId").limit(1000)).then(({ data }) => {
 			if (!cancelled) setReconciliationRows(data ?? []);
 		}).catch(() => {
 			if (!cancelled) setReconciliationRows([]);

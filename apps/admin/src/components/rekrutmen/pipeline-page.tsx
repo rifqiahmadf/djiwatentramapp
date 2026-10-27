@@ -10,7 +10,7 @@ export function RecruitmentPipelinePage() {
   const [position, setPosition] = useState("");
   const [selected, setSelected] = useState<RecruitmentPipelineCard | null>(null);
   const cards = listData<RecruitmentPipelineCard>(query.data);
-  const positions = useMemo(() => Array.from(new Set(cards.map((card) => card.posisi_dilamar).filter(Boolean))).sort(), [cards]);
+  const positions = useMemo(() => Array.from(new Set(cards.map((card) => card.posisi_dilamar).filter((position): position is string => typeof position === "string" && position.length > 0))).sort(), [cards]);
   const visible = useMemo(() => position ? cards.filter((card) => card.posisi_dilamar === position) : cards, [cards, position]);
   const transition = async (candidate: RecruitmentPipelineCard, toStatus: string, reason?: string) => {
     await mutate(`/candidates/${encodeURIComponent(candidate.id)}/status-transition`, { method: "POST", body: JSON.stringify({ toStatus, expectedStatus: candidate.status === "Applied" ? "Application Received" : candidate.status, reason }) });

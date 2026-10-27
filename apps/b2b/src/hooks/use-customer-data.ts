@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/client";
 import { invokeEdgeFunction } from "@/lib/api-helper";
@@ -108,7 +109,7 @@ function mapPointEntry(row: Record<string, unknown>): CustomerPointEntry {
 	};
 }
 
-const CUSTOMER_API_BASE = "https://api.yumme.id/v1/customer";
+const CUSTOMER_API_BASE = publicUrl("VITE_API_ORIGIN", "/v1/customer");
 
 // ── useCustomerOrders ──────────────────────────────────────────
 // Query pos_orders WHERE customer_source_id = user.id.

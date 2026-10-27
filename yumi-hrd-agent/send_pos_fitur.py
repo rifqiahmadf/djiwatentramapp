@@ -24,7 +24,7 @@ r.raise_for_status()
 employees = r.json()
 print(f"\n👥 Found {len(employees)} employees")
 
-photo_path = "/opt/djiwatentramapp/yumi-hrd-agent/pos_fitur_baru.jpg"
+photo_path = f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-hrd-agent/pos_fitur_baru.jpg"
 if not os.path.exists(photo_path):
     print(f"ERROR: Photo not found")
     sys.exit(1)

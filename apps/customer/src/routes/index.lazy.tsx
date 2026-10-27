@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../packages/env/src/endpoints";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useCustomerSplashGate } from "@/hooks/use-customer-splash-gate";
@@ -193,7 +194,7 @@ function BrandCustomerIndex() {
 								</button>
 
 								<a
-									href="https://booking.yumme.id/"
+									href={publicUrl("VITE_BOOKING_ORIGIN", "/")}
 									aria-label="Booking Acara & Kolaborasi"
 									className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-[14px] border border-primary/20 bg-primary/5 px-3 py-2.5 text-xs font-black text-primary transition-all duration-[180ms] hover:bg-primary/10 active:scale-[.97]"
 								>

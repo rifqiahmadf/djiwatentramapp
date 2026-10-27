@@ -814,6 +814,117 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 		shiftReminderMinutes,
 	]);
 
+	const [isTargetExpanded, setIsTargetExpanded] = useState(false);
+	const progress = useHybridCurrentMonthProgress();
+
+	const shiftPct = useMemo(
+		() => Math.max(0, progress?.shiftTarget ? (progress.shiftCollected / progress.shiftTarget) * 100 : 0),
+		[progress?.shiftCollected, progress?.shiftTarget]
+	);
+	const dailyPct = useMemo(
+		() => Math.max(0, progress?.dailyTarget ? (progress.dailyCollected / progress.dailyTarget) * 100 : 0),
+		[progress?.dailyCollected, progress?.dailyTarget]
+	);
+	const monthlyPct = useMemo(
+		() => Math.max(0, progress?.progressPct ?? 0),
+		[progress?.progressPct]
+	);
+
+	const roleBonusConfigById = useMemo(() => {
+		const map = new Map<string, RoleBonusConfig>();
+		(roles ?? []).forEach((role: any) => {
+			const config = normalizeRoleBonusConfig(role);
+			if (config) {
+				map.set(String(role._id), config);
+			}
+		});
+		return map;
+	}, [roles]);
+
+	const onDutyNameList = useMemo(() => {
+		const names = new Set<string>();
+		const cashierName = shiftStatus?.ongoingShift?.cashierName || shiftStatus?.shiftInfo?.cashierName;
+		if (cashierName) names.add(cashierName.trim());
+
+		const teamRaw = shiftStatus?.ongoingShift?.teamMembers || "";
+		teamRaw
+			.split(/[,\n;|]/g)
+			.map((name: string) => name.trim())
+			.filter(Boolean)
+			.forEach((name: string) => names.add(name));
+
+		return Array.from(names);
+	}, [shiftStatus?.ongoingShift?.cashierName, shiftStatus?.ongoingShift?.teamMembers, shiftStatus?.shiftInfo?.cashierName]);
+
+	const onDutyMembers = useMemo(() => {
+		const allUsers = users ?? [];
+		return onDutyNameList.map((name) => {
+			const matched = allUsers.find(
+				(user: any) => normalizePersonName(user.name) === normalizePersonName(name)
+			);
+			return {
+				name,
+				roleId: matched?.roleId ?? null,
+				roleName: matched?.roleName ?? "-",
+			};
+		});
+	}, [onDutyNameList, users]);
+
+	const memberBonusSummary = useMemo((): MemberBonusSummary[] => {
+		return onDutyMembers
+			.map((member) => {
+				if (!member.roleId) return null;
+				const config = roleBonusConfigById.get(String(member.roleId));
+				if (!config) return null;
+				const achievementPct =
+					config.basis === "shift"
+						? shiftPct
+						: config.basis === "daily"
+							? dailyPct
+							: monthlyPct;
+				const summary = summarizeRoleBonus(achievementPct, config);
+				return {
+					memberName: member.name,
+					roleName: member.roleName,
+					basis: config.basis,
+					achievementPct: summary.achievementPct,
+					achievedBonus: summary.achievedBonus,
+					reachedThresholds: summary.reachedThresholds,
+					nextTier: summary.nextTier,
+					allTiers: summary.allTiers,
+				};
+			})
+			.filter((item): item is MemberBonusSummary => item !== null);
+	}, [onDutyMembers, roleBonusConfigById, shiftPct, dailyPct, monthlyPct]);
+
+	const shiftBonusSummary = useMemo(
+		() =>
+			memberBonusSummary.filter((item) => item.basis === "shift"),
+		[memberBonusSummary]
+	);
+
+	const dailyBonusSummary = useMemo(
+		() =>
+			memberBonusSummary.filter((item) => item.basis === "daily"),
+		[memberBonusSummary]
+	);
+
+	const monthlyBonusSummary = useMemo(
+		() =>
+			memberBonusSummary.filter((item) => item.basis === "monthly"),
+		[memberBonusSummary]
+	);
+
+	const totalShiftBonusNow = useMemo(
+		() => shiftBonusSummary.reduce((sum, item) => sum + item.achievedBonus, 0),
+		[shiftBonusSummary]
+	);
+	const totalDailyBonusNow = useMemo(
+		() => dailyBonusSummary.reduce((sum, item) => sum + item.achievedBonus, 0),
+		[dailyBonusSummary]
+	);
+
+
 	// Checkout opens only on intent; landing and restored URL panels must stay visible.
 
 	// Refs for scrolling
@@ -842,12 +953,12 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 	const filteredProducts = useMemo(() => {
 		if (!searchQuery.trim()) return products ?? allProducts;
 		if (!allProducts) return [];
-		
+
 		const query = searchQuery.toLowerCase();
 		return allProducts.filter((p: any) => {
 			const matchName = p.name.toLowerCase().includes(query);
 			const matchMenuNumber = p.menuNumber?.toString().includes(query);
-			
+
 			// Match category name
 			let matchCategory = false;
 			if (p.categoryId && categories) {
@@ -856,10 +967,10 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 					matchCategory = true;
 				}
 			}
-			
+
 			// Match description
 			const matchDescription = p.description?.toLowerCase().includes(query);
-			
+
 			return matchName || matchMenuNumber || matchCategory || matchDescription;
 		});
 	}, [searchQuery, products, allProducts, categories]);
@@ -889,10 +1000,10 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 	// Category lists for Point 2: Main tabs vs Local chips
 	const { categoryTabs, activeSubcategories, activeParentName } = useMemo(() => {
 		if (!categories) return { categoryTabs: [{ _id: "all", name: "Semua" }], activeSubcategories: [], activeParentName: "" };
-		
+
 			const parents = categories.filter((c: any) => !c.parentId && c.track !== "hidden");
 		const tabs = [{ _id: "all", name: "Semua" }, ...parents];
-		
+
 		let subs: any[] = [];
 		let parentName = "";
 		if (activeParentId) {
@@ -983,7 +1094,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 				}
 			}
 		},
-		[categoryTabs, scrollCategoryIntoView]
+		[categoryTabs]
 	);
 
 	useEffect(() => {
@@ -1036,31 +1147,6 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 		};
 	}, [filteredProductsLength, hasMoreProducts, isLoading]);
 
-		(action: "menu" | "back" | "search" | string) => {
-			switch (action) {
-				case "back":
-					// Back button is removed
-					break;
-				case "menu":
-					openPanel("more");
-					break;
-				case "search":
-					const searchInput = document.querySelector(
-						'input[placeholder*="Cari"]'
-					) as HTMLInputElement;
-					if (searchInput) {
-						searchInput.focus();
-					}
-					break;
-				default:
-					// Check if it's one of the sidebar menu tabs
-					if (SIDEBAR_MENU_ITEMS.some(item => item.id === action)) {
-						handleOpenSidebar(action);
-					}
-			}
-		},
-		[openPanel]
-	);
 
 	// Get cart quantity for a product
 	const getCartQty = (productId: string) =>
@@ -1156,7 +1242,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 				quantity: i.quantity,
 				track: resolveProductionTrack(i, allProducts ?? products, categories),
 			}));
-			
+
 			const subtotal = items.reduce(
 				(sum: number, item: OrderItem) => sum + (item.originalPrice ?? item.price) * item.quantity,
 				0
@@ -1307,7 +1393,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 				toast.error("Browser ini tidak mendukung Web Bluetooth (gunakan Chrome/Edge).", { id: "printing" });
 				return;
 			}
-			
+
 			if (!bluetoothPrinter.isConnected()) {
 				const connected = await bluetoothPrinter.autoReconnectIfNeeded(0);
 				if (!connected) {
@@ -1757,7 +1843,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 					>
 					<div className="flex flex-col px-3 py-1.5 gap-1">
 						{/* ROW 1: Logo & Store name */}
-						<div 
+						<div
 							className={cn(
 								"flex items-center justify-between min-w-0 transition-all",
 							)}
@@ -1817,7 +1903,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 									<TrendingUp className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
 									<span className="text-[10px] font-black uppercase tracking-widest text-foreground/80">Target Bonus</span>
 								</div>
-								<button 
+								<button
 									onClick={() => setIsTargetExpanded(!isTargetExpanded)}
 									className="flex items-center gap-1.5 rounded-full border-2 border-primary/20 px-2 py-0.5 hover:bg-primary/5 text-primary transition-all active:scale-95"
 									type="button"
@@ -1835,7 +1921,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 										<span>{Math.round(shiftPct)}%</span>
 									</div>
 									<div className="h-1 w-full bg-muted/40 rounded-full overflow-hidden" role="progressbar" aria-label="Progress shift" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(shiftPct)}>
-										<motion.div 
+										<motion.div
 											className="h-full bg-primary"
 											initial={{ width: 0 }}
 											animate={{ width: `${Math.min(100, shiftPct)}%` }}
@@ -1848,7 +1934,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 									)}
 									<AnimatePresence>
 										{isTargetExpanded && (
-											<motion.div 
+											<motion.div
 												initial={{ opacity: 0, height: 0 }}
 												animate={{ opacity: 1, height: "auto" }}
 												exit={{ opacity: 0, height: 0 }}
@@ -1897,7 +1983,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 										<span>{Math.round(dailyPct)}%</span>
 									</div>
 									<div className="h-1.5 w-full bg-muted/40 rounded-full overflow-hidden" role="progressbar" aria-label="Progress harian" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(dailyPct)}>
-										<motion.div 
+										<motion.div
 											className="h-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.2)]"
 											initial={{ width: 0 }}
 											animate={{ width: `${Math.min(100, dailyPct)}%` }}
@@ -1910,7 +1996,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 									)}
 									<AnimatePresence>
 										{isTargetExpanded && (
-											<motion.div 
+											<motion.div
 												initial={{ opacity: 0, height: 0 }}
 												animate={{ opacity: 1, height: "auto" }}
 												exit={{ opacity: 0, height: 0 }}
@@ -2046,10 +2132,10 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 			/>
 
 				{/* Hidden MenuSidebar for control */}
-				<MenuSidebar 
+				<MenuSidebar
 					hideTrigger
-					triggerOpen={isSidebarOpen} 
-					onOpenChange={setIsSidebarOpen} 
+					triggerOpen={isSidebarOpen}
+					onOpenChange={setIsSidebarOpen}
 					initialTab={activeSidebarTab}
 					onTabChange={tab => openPanel(tab as PosPanel)}
 				/>
@@ -2115,7 +2201,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 					>
 						{categoryTabs.map((cat, index) => {
 							const isActive = activeParentId === cat._id || (cat._id === "all" && !activeParentId);
-							
+
 							return (
 								<button
 									key={cat._id}
@@ -2126,7 +2212,6 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 										isActive
 											? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary"
 											: "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50",
-										isFocused && "ring-2 ring-primary ring-offset-2 transition-shadow"
 									)}
 								>
 									{cat.name}
@@ -2228,7 +2313,6 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 								    className={cn(
 								      "group relative flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm text-left",
 								      "transition-shadow",
-								      isFocused && "ring-2 ring-primary ring-offset-2 shadow-lg"
 								    )}
 									>
 										{/* Image */}
@@ -2279,9 +2363,7 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 											)}
 
 											{/* Keyboard focus indicator */}
-											{isFocused && (
-												<div className="absolute inset-0 border-2 border-primary rounded-t-2xl pointer-events-none" />
-											)}
+
 										</div>
 
 										{/* Info */}
@@ -2385,9 +2467,9 @@ const [priceDialogValue, setPriceDialogValue] = useState("");
 
 			{/* RIGHT CONTENT: Checkout Sidebar (Desktop/Tablet) */}
 			<div className="hidden md:block w-[320px] lg:w-[380px] shrink-0 overflow-hidden relative">
-				<CheckoutSidebar 
-					onConfirmPayment={handlePaymentConfirm} 
-					isSubmitting={isSubmitting} 
+				<CheckoutSidebar
+					onConfirmPayment={handlePaymentConfirm}
+					isSubmitting={isSubmitting}
 					lastOrderId={lastOrderId}
 					onPrintOrder={(orderId, mode) => { void handlePrint(orderId as Id<"orders">, mode); }}
 					onPrintLastOrder={() => lastOrderId && handlePrint(lastOrderId)}

@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-SELFHOST_DIR="/opt/supabase-selfhost/volumes/functions"
-LOCAL_DIR="/opt/djiwatentramapp/supabase/functions"
+SELFHOST_DIR="${SUPABASE_SELFHOST_DIR:?Set SUPABASE_SELFHOST_DIR}/volumes/functions"
+LOCAL_DIR="${APP_ROOT:?Set APP_ROOT}/supabase/functions"
 RESTART_NEEDED=false
 
 # Colors
@@ -47,6 +47,8 @@ sync_function() {
     RESTART_NEEDED=true
 }
 
+sync_function "_shared"
+
 # Determine which functions to sync
 if [ $# -gt 0 ]; then
     for fn in "$@"; do
@@ -74,4 +76,4 @@ fi
 
 echo ""
 echo "✅ Deploy complete!"
-echo "   Functions available at: https://supabase.yumme.id/functions/v1/"
+echo "   Functions available at: ${SUPABASE_URL:?Set SUPABASE_URL}/functions/v1/"

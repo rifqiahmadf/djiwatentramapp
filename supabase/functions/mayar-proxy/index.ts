@@ -1,3 +1,4 @@
+import { requiredEnv } from "../_shared/env.ts";
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const corsHeaders = {
@@ -315,7 +316,7 @@ async function createInvoice(payload: Record<string, unknown>) {
 		name: normalizeCustomerName(payload.name),
 		email: contactFallback(normalizeCustomerEmail, payload.email, MAYAR_DEFAULT_EMAIL),
 		mobile: contactFallback(normalizeMobile, payload.mobile, MAYAR_DEFAULT_MOBILE),
-		redirectUrl: (payload.redirectUrl as string)?.trim() || "https://zantara.myr.id",
+		redirectUrl: (payload.redirectUrl as string)?.trim() || requiredEnv("MAYAR_REDIRECT_URL"),
 		description: payload.description || "",
 		expiredAt: payload.expiredAt || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
 		items: (Array.isArray(payload.items) ? payload.items : []).map((value: unknown) => {

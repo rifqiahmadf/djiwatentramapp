@@ -51,7 +51,7 @@ SUPABASE_KEY = SUPABASE_SERVICE_ROLE_KEY or os.getenv("SUPABASE_KEY", "")
 SUPABASE_ACCESS_TOKEN = os.getenv("SUPABASE_ACCESS_TOKEN", "")
 
 # SumoPod API — untuk AI chat & vision/OCR
-SUMOPOD_API_KEY = os.getenv("SUMOPOD_API_KEY", "sk-UfA-KXloOB3ZLHSQWxb0Cw")
+SUMOPOD_API_KEY = os.getenv("SUMOPOD_API_KEY", "")
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
@@ -87,7 +87,7 @@ finance = FinanceManager(SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_ROLE_KEY, 
 inventory = InventoryManager(SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ACCESS_TOKEN)
 orchestrator = FinanceOrchestrator(SUMOPOD_API_KEY, SUPABASE_URL, SUPABASE_KEY)
 memory = MemoryManager(SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_ROLE_KEY)
-AI_BASE_URL = os.getenv("NINEROUTER_BASE_URL") or os.getenv("SUMOPOD_BASE_URL", "http://127.0.0.1:20128/v1")
+AI_BASE_URL = os.getenv("NINEROUTER_BASE_URL") or os.environ["SUMOPOD_BASE_URL"].rstrip("/")
 analyzer = TransactionAnalyzer(SUMOPOD_API_KEY, AI_BASE_URL, SUPABASE_URL, SUPABASE_ACCESS_TOKEN)
 receipt_inventory = ReceiptInventoryAdapter(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY)
 # supplier moved to Yumi Purchasing

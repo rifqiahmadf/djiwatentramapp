@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../../../packages/env/src/endpoints";
 import { requestAdminConfirm } from "@/lib/admin-dialogs";
 import {
   CalendarDays,
@@ -196,7 +197,7 @@ export function KolPortalAdminPage() {
 
 function SharedVisitLinkPanel() {
   const [copiedLink, setCopiedLink] = useState(false);
-  const visitUrl = "https://kolmarketing.yumme.id/";
+  const visitUrl = publicUrl("VITE_KOL_ORIGIN", "/");
   const copy = async () => {
     try { await navigator.clipboard.writeText(visitUrl); setCopiedLink(true); window.setTimeout(() => setCopiedLink(false), 2200); }
     catch { setCopiedLink(false); }

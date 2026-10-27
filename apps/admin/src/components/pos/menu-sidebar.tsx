@@ -1,3 +1,4 @@
+import { publicUrl } from "../../../../../packages/env/src/endpoints";
 import { Djiwa3DIcon, type Djiwa3DIconName } from "@yumipos/web-shared";
 import { getDisplayOrderNumber } from "@yumipos/web-shared/lib/order-number";
 import type { Doc, Id } from "@/types/backend-compat";
@@ -1146,10 +1147,11 @@ function DashboardTab({
 			setTeamAttendance({});
 			return;
 		}
+		const teamMembers = shiftStatus.ongoingShift.teamMembers;
 		const fetchAttendance = async () => {
 			setTeamAttendanceLoading(true);
 			const supabase = createClient();
-			const memberNames = shiftStatus.ongoingShift.teamMembers
+			const memberNames = teamMembers
 				.split(",")
 				.map((n: string) => n.trim())
 				.filter(Boolean);
@@ -2381,7 +2383,7 @@ function ShiftManagement({ onClose }: { onClose: () => void }) {
 			
 			// Kirim notifikasi text ke grup Report
 			if (summary && shiftInfo) {
-				const { summary: s, shift: si } = { summary, shiftInfo };
+				const { summary: s, shiftInfo: si } = { summary, shiftInfo };
 				
 				// Format non-tunai breakdown
 				const pb = s.paymentBreakdown || {};
@@ -2477,7 +2479,7 @@ ${pecahanTxt.length ? pecahanTxt.join("\n") : "(tidak diisi)"}`,
 						}, logoB64);
 						
 												// Kirim HTML ke bot - simpan di VPS + kirim link ke grup
-						fetch("http://localhost:8001/save-report", {
+						fetch(publicUrl("VITE_REPORT_SERVICE_URL", "/save-report"), {
 							method: "POST",
 							headers: { "Content-Type": "application/json" },
 							body: JSON.stringify({
@@ -3298,7 +3300,7 @@ function ExpenseForm({ onClose }: { onClose: () => void }) {
 		setAiParsing(true);
 		setAiBantuUsed(false); // reset dulu, nanti di-set true kalau sukses
 		try {
-			const res = await fetch("http://localhost:8002/ai-parse-text", {
+			const res = await fetch(publicUrl("VITE_AI_PARSER_URL", "/ai-parse-text"), {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ text: textToParse }),

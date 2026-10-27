@@ -389,7 +389,7 @@ PENTING:
         import httpx
 
         headers = sumopod_client._headers() if sumopod_client else {"Authorization": "", "Content-Type": "application/json"}
-        base_url = sumopod_client.base_url if sumopod_client else (os.getenv("NINEROUTER_BASE_URL") or "http://127.0.0.1:20128/v1")
+        base_url = sumopod_client.base_url if sumopod_client else (os.getenv("NINEROUTER_BASE_URL") or f"{os.environ['NINEROUTER_BASE_URL'].rstrip('/')}")
 
         # Use the text model (not vision model)
         model = os.getenv("NINEROUTER_TEXT_MODEL") or "ds/deepseek-v4-flash"

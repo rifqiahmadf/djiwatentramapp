@@ -1,3 +1,4 @@
+import { requiredEnv } from "../_shared/env.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
     const fn = actionMap[action];
     if (!fn) return json({ success: false, error: { code: "UNKNOWN_ACTION", message: "Booking action is not supported" } }, 400);
 
-    const url = Deno.env.get("SUPABASE_URL") ?? "http://kong:8000";
+    const url = requiredEnv("SUPABASE_URL");
     const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SERVICE_KEY") ?? "";
     if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not configured");
     const db = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } }).schema("pos");

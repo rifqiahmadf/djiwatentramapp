@@ -55,7 +55,7 @@ caption = (
 )
 
 # 3. Send to each employee
-photo_path = "/opt/djiwatentramapp/yumi-hrd-agent/briefing_musik.jpg"
+photo_path = f"{os.environ['APP_ROOT'].rstrip('/')}/yumi-hrd-agent/briefing_musik.jpg"
 if not os.path.exists(photo_path):
     print(f"ERROR: Photo not found at {photo_path}")
     sys.exit(1)

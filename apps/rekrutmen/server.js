@@ -109,6 +109,18 @@ async function uploadToStorage(objectPath, buffer, contentType) {
 app.use(cors());
 app.use(express.json({ limit: "15mb" }));
 
+// Public configuration only; never serialize process.env or server credentials.
+app.get("/public-config.js", (_req, res) => {
+  const value = process.env.RECRUITMENT_API_ORIGIN?.trim();
+  if (!value) return res.status(503).type("text/plain").send("Missing RECRUITMENT_API_ORIGIN");
+  let url;
+  try { url = new URL(value); } catch { return res.sendStatus(503); }
+  if (!["https:", "http:"].includes(url.protocol) || url.origin !== value) return res.sendStatus(503);
+  res.set("Cache-Control", "no-store").type("application/javascript").send(
+    `window.__RECRUITMENT_CONFIG__ = ${JSON.stringify({ apiOrigin: url.origin }).replace(/</g, "\\u003c")};`
+  );
+});
+
 app.get("/admin", (_req, res) => res.sendFile(path.join(__dirname, "public", "admin.html")));
 app.post("/api/recruitment-outsourcing/login", (req, res) => {
   const auth = readOutsourcingAuth();
@@ -439,7 +451,7 @@ SELECT json_build_object('duplicate', false, 'id', id)::text FROM inserted`;
       posisi_dilamar: position, tipe_kerja: b["Full time/Part time"], cv_url: b["CV URL"],
       created_at: new Date().toISOString().split("T")[0],
     });
-    const notifScript = "/opt/djiwatentramapp/yumi-hrd-agent/notify_new_applicant.py";
+    const notifScript = process.env.RECRUITMENT_NOTIFY_SCRIPT || path.join(__dirname, "../../yumi-hrd-agent/notify_new_applicant.py");
     const notifier = spawn("python3", [notifScript, notifPayload], { detached: true, stdio: "ignore" });
     notifier.on("error", (error) => console.error("Notif lamaran gagal dijalankan:", error.message));
     notifier.unref();
